@@ -5,7 +5,7 @@ const sqlite = require('./ingestors/sqlite')
 try {
     (async () => {
         console.log("Welcome!")
-        sqlite.ingest(ec2.scrape())
+        sqlite.ingest(await ec2.scrape())
     })()
 } catch (e) {
     console.error(e.message)
