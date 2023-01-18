@@ -1,1 +1,1 @@
-# aws-inventory-scrapper
+# awscraper 
