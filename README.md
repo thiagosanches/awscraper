@@ -29,7 +29,7 @@ PRIMARY KEY("Id"));
 ```
 
 No matter the resources, we are planning to store the **mandatory** fields:
-- ID: the `ARN` of the resource (Primary key).
+- ID: the `ARN` of the resource (primary key).
 - Type: a value defined programatically: `ec2`, `cloudfront` according to the original resource.
 - Status: `LIVE` or `DELETED`.
 - RawObject: a json object that could represent the whole AWS object or any object that you have built.
