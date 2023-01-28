@@ -1,6 +1,13 @@
 const sqlite3 = require('sqlite3').verbose()
 const db = new sqlite3.Database('database.db');
 
+async function nullable(column) {
+    let value = "NULL"
+    if (column)
+        value = `'${column}'`
+    return value
+}
+
 module.exports.ingest = async function (data) {
     console.log("💿 Ingesting received data!")
     db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
@@ -15,7 +22,7 @@ module.exports.ingest = async function (data) {
 
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
-        db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', '${obj.Team}', '${obj.Comments}', CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
+        db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', '${await nullable(obj.Team)}', '${await nullable(obj.Comments)}', CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
             if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's contraint error we already expect that!
                 console.log(err)
         })
