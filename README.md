@@ -61,7 +61,7 @@ You can add more scrapers into this project to increase the capacity of this too
 
 Update the [index.js](./index.js) file, for example:
 
-```nodejs
+```javascript
 const route53 = require('./scrapers/route53')
 const route53Mapper = require('./mappers/route53');
 ...
