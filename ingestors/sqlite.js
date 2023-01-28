@@ -14,9 +14,8 @@ module.exports.ingest = async function (data) {
 
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
-        
-        await db.exec(`
-            INSERT INTO "resources" VALUES (\"${obj.Id}\", \"${data.type}\", \"${obj.Status}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`
-        )
+        db.exec(`INSERT INTO "resources" VALUES (\"${obj.Id}\", \"${data.type}\", \"${obj.Status}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`, err => {
+            if (err) console.log(`${obj.Id} already ingested!`)
+        })
     }
 }
