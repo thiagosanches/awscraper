@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose()
 const db = new sqlite3.Database('database.db');
 
 module.exports.ingest = async function (data) {
-    console.log("       Ingesting received data!")
+    console.log("💿 Ingesting received data!")
     await db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
         "Id"        TEXT NOT NULL,
         "Type"      TEXT,
@@ -16,7 +16,8 @@ module.exports.ingest = async function (data) {
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
         db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', '${obj.Team}', '${obj.Comments}', CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
-            if (err) console.log(`${obj.Id} already ingested (???)`, err.code)
+            if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's contraint error we already expect that!
+                console.log(err)
         })
     }
 
@@ -33,7 +34,7 @@ module.exports.ingest = async function (data) {
         db.exec(`INSERT INTO "${temporaryTable}" VALUES (\"${obj.Id}\");`)
     }
 
-    const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}") and Type = '${data.type}';`
+    const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}") and "Type" = '${data.type}';`
     await db.exec(updateDeletedItemsSql)
 
     //remove the temp table.
