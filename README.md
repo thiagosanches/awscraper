@@ -37,7 +37,23 @@ On **every** execution, scrapers will always perform the operation that you deve
 
 Ingestor will the responsible to know how to write the data into the database. Right know, to handle items that were removed from the Cloud (AWS for now) we are saving everything into a temporary table to perform a `NOT IN` operation on SQLite. If something that is not there on the AWS's list anymore, is marked as `DELETED` on the database.
 
-We'll might have some performance issues in the future, so need to keep the eyes on this topic here.
+**We'll might have some performance issues in the future, so need to keep the eyes on this topic here.**
 
 ## How to contribute?
+You can add more scrapers into this project to increase the capacity of this tool. Basically, you need to create two files and change the `index.js`, for example if you are going to add the `Route53` capability to the tool:
+
+- `mappers/route53.js`
+- `scrapers/route53.js`
+
+Update the [index.js](./index.js) file, for example:
+
+```nodejs
+const route53 = require('./scrapers/route53')
+const route53Mapper = require('./mappers/route53');
+...
+sqlite.ingest(await route53Mapper.map(await route53.scrape()))
+...
+```
+
+Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.js](./scrapers/cloudfront.js)) when creating your new feature. They are not perfect, but it works (at least for now haha)!
 
