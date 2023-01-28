@@ -35,7 +35,7 @@ No matter the resources, we are planning to store the **mandatory** fields:
 ## How it works?
 On **every** execution, scrapers will always perform the operation that you developed them to do. Mappers will receive the data, perform some transformation and pass the objects to Ingestors.
 
-Ingestor will the responsible to know how to write the data into the database. Right know, to handle items that were removed from the Cloud (AWS for now) we are saving everything into a temporary table to perform a `NOT IN` operation on SQLite. If something that is not there on the AWS's list anymore, is marked as `DELETED` on the database.
+Ingestor will the responsible to know how to write the data into the database. Right now, to handle items that were removed from the Cloud (AWS for now) we are saving everything into a temporary table to perform a `NOT IN` operation on SQLite. If something that is not there on the AWS's list anymore, is marked as `DELETED` on the database.
 
 **We'll might have some performance issues in the future, so need to keep the eyes on this topic here.**
 
