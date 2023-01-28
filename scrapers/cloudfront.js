@@ -4,7 +4,7 @@ module.exports.scrape = async function () {
     console.log("   Scrapping CloudFront data!")
 
     const cloudfront = new AWS.CloudFront({ apiVersion: '2020-05-31' });
-    const data = []
+    const data = { type: 'cloudfront', items: [] }
     const params = {}
 
     do {
@@ -12,10 +12,9 @@ module.exports.scrape = async function () {
         if (result.DistributionList &&
             result.DistributionList.Items) {
             params.Marker = result.DistributionList.NextMarker
-            result.DistributionList.Items.forEach(i => data.push(i))
+            result.DistributionList.Items.forEach(i => data.items.push(i))
         }
     } while (params.Marker)
 
-    console.log(data)
     return data
 }
