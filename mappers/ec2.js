@@ -6,11 +6,7 @@ module.exports.map = async function (data) {
         type: data.type,
         items: _.map(data.items, function (m) {
             return {
-                Id: m.ARN,
-                DomainName: m.DomainName,
-                WebACLId: m.WebACLId,
-                AliasICPRecordals: _.map(m.AliasICPRecordals,
-                    function (obj) { return obj.CNAME }).join(', '),
+                Id: m.InstanceId,
                 RawObj: JSON.stringify(m),
                 ...baseObject
             }

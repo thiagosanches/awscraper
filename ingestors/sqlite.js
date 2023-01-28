@@ -16,8 +16,7 @@ module.exports.ingest = async function (data) {
         const obj = data.items[i]
         
         await db.exec(`
-            INSERT INTO "resources" VALUES (\"${obj.ARN}\", \"${data.type}\", \"${obj.Deleted}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`
+            INSERT INTO "resources" VALUES (\"${obj.Id}\", \"${data.type}\", \"${obj.Deleted}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`
         )
     }
-    await db.close()
 }
