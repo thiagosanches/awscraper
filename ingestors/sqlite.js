@@ -3,7 +3,7 @@ const db = new sqlite3.Database('database.db');
 
 module.exports.ingest = async function (data) {
     console.log("💿 Ingesting received data!")
-    await db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
+    db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
         "Id"        TEXT NOT NULL,
         "Type"      TEXT,
         "Status"	TEXT NOT NULL,
@@ -27,7 +27,7 @@ module.exports.ingest = async function (data) {
     const formattedDate = ("0" + d.getDate()).slice(-2) + ("0" + (d.getMonth() + 1)).slice(-2) + d.getFullYear() + ("0" + d.getHours()).slice(-2) + ("0" + d.getMinutes()).slice(-2);
     const temporaryTable = `${data.type}_${formattedDate}`
     const createTemporaryTable = `CREATE TABLE "${temporaryTable}" ("Id" TEXT NOT NULL);`
-    await db.exec(createTemporaryTable)
+    db.exec(createTemporaryTable)
 
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
@@ -35,8 +35,8 @@ module.exports.ingest = async function (data) {
     }
 
     const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}") and "Type" = '${data.type}';`
-    await db.exec(updateDeletedItemsSql)
+    db.exec(updateDeletedItemsSql)
 
     //remove the temp table.
-    await db.exec(`DROP TABLE ${temporaryTable};`)
+    db.exec(`DROP TABLE ${temporaryTable};`)
 }
