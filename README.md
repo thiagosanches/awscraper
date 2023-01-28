@@ -18,13 +18,13 @@ To save the returned data from scrapers we defined a simple table:
 
 ```sql
 CREATE TABLE IF NOT EXISTS "resources" (
-"Id"        TEXT NOT NULL,
-"Type"      TEXT,
-"Status"	  TEXT NOT NULL,
-"Team"      TEXT,
-"Comments"	TEXT,
+"Id" TEXT NOT NULL,
+"Type" TEXT,
+"Status" TEXT NOT NULL,
+"Team" TEXT,
+"Comments" TEXT,
 "LastModified" TEXT NOT NULL,
-"RawObj"	TEXT,
+"RawObj" TEXT,
 PRIMARY KEY("Id"));
 ```
 
