@@ -3,6 +3,8 @@ AWScraper is a backend tool to centralize all the cloud (AWS for now) data that 
 
 We can also add some custom data for any resource to make it easy to search them. In the future, there will be a front-end application that will read the database in order to display the information in an easy way for any non-technical user.
 
+There will be a cron job that should run this periodically to continuing fetching the data.
+
 We are also planning to add a logic that will create a relationship between the cloud resource and the source-code (nodejs, java, c#, no matter), when that exists.
 
 Right now, we are saving the data into a SQLite database and managing it through [SQLiteStudio](https://www.sqlitestudio.pl/).
