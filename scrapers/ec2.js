@@ -12,6 +12,6 @@ module.exports.scrape = async function () {
         params.NextToken = result.NextToken
         result.Reservations.forEach(i => data.push(...i.Instances))
     } while (params.NextToken)
-
+    
     return data
 }
