@@ -5,6 +5,8 @@ We can also add some custom data for any resource to make it easy to search them
 
 There will be a cron job that should run this periodically to continuing fetching the data.
 
+We also need to keep in mind to avoid throttling from AWS when doing API calls.
+
 We are also planning to add a logic that will create a relationship between the cloud resource and the source-code (nodejs, java, c#, no matter), when that exists.
 
 Right now, we are saving the data into a SQLite database and managing it through [SQLiteStudio](https://www.sqlitestudio.pl/).
