@@ -34,6 +34,11 @@ No matter the resources, we are planning to store the **mandatory** fields:
 
 ![image](https://user-images.githubusercontent.com/5191469/215285305-027433f3-7403-43d8-9104-e88669507dc0.png)
 
+We can also rely on the built-in `json_extract()` function from SQLite, in order to extract the JSON data from the RawObj, if we want to return more details that are not part of the **mandatory** fields. For example, to return cloudfront distributions that doesn't have WebACLId:
+
+```sql
+SELECT Id from "resources" where json_extract(RawObj, '$.WebACLId') = ''
+```
 
 ## How it works?
 On **every** execution, scrapers will always perform the operation that you developed them to do. Mappers will receive the data, perform some transformation and pass the objects to Ingestors.
