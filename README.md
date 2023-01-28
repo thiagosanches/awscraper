@@ -32,6 +32,9 @@ No matter the resources, we are planning to store the **mandatory** fields:
 - Status: `LIVE` or `DELETED`.
 - RawObject: a json object that could represent the whole AWS object or any object that you have built.
 
+![image](https://user-images.githubusercontent.com/5191469/215285305-027433f3-7403-43d8-9104-e88669507dc0.png)
+
+
 ## How it works?
 On **every** execution, scrapers will always perform the operation that you developed them to do. Mappers will receive the data, perform some transformation and pass the objects to Ingestors.
 
