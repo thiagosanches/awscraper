@@ -28,7 +28,7 @@ module.exports.ingest = async function (data) {
         })
     }
 
-    //checks for something that it was not returned by the scrapper anymore, 
+    //checks for something that it was not returned by the scraper anymore, 
     //so we need to remove it or mark it as 'DELETED' and not 'LIVE' anymore.
     const d = new Date()
     const formattedDate = ("0" + d.getDate()).slice(-2) + ("0" + (d.getMonth() + 1)).slice(-2) + d.getFullYear() + ("0" + d.getHours()).slice(-2) + ("0" + d.getMinutes()).slice(-2);
