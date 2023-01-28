@@ -1,6 +1,6 @@
 module.exports = { 
     Team: null,
     Comments: null,
-    Deleted: null,
+    Status: 'LIVE',
     Type: null,
-}
+} 

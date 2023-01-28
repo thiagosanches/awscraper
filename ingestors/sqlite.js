@@ -6,7 +6,7 @@ module.exports.ingest = async function (data) {
     await db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
         "Id"        TEXT NOT NULL,
         "Type"      TEXT,
-        "Deleted"	INTEGER NOT NULL,
+        "Status"	TEXT NOT NULL,
         "Team"      TEXT,
         "Comments"	TEXT,
         "RawObj"	TEXT,
@@ -16,7 +16,7 @@ module.exports.ingest = async function (data) {
         const obj = data.items[i]
         
         await db.exec(`
-            INSERT INTO "resources" VALUES (\"${obj.Id}\", \"${data.type}\", \"${obj.Deleted}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`
+            INSERT INTO "resources" VALUES (\"${obj.Id}\", \"${data.type}\", \"${obj.Status}\", \"${obj.Team}\", \"${obj.Comments}\", '${obj.RawObj}')`
         )
     }
 }
