@@ -10,7 +10,7 @@ Right now, we are saving the data into a SQLite database and managing it through
 ## Overview
 There are 3 main components in the application:
 - **Ingestors**: It's responsible to write the data into the database. At this moment, we are trying to define a model that fits for ALL.
-- **Scrapers**: It's responsible to fetch all the data that you want (that you think it's important for you).
+- **Scrapers**: It's responsible to fetch all the data that you want (that you think it's important for you). It's important to remember to perform the operations in a paginated way if necessary.
 - **Mappers**: It's responsible to transform the AWS object into a more customizable object that fits into the database.
 
 ![image](https://user-images.githubusercontent.com/5191469/215287058-017f344f-7dd1-45f3-b5b8-778b93769e04.png)
