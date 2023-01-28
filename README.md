@@ -43,9 +43,9 @@ SELECT Id from "resources" where json_extract(RawObj, '$.WebACLId') = ''
 ```
 
 ## How it works?
-On **every** execution, scrapers will always perform the operation that you developed them to do. Mappers will receive the data, perform some transformation and pass the objects to Ingestors.
+On **every** execution, **Scrapers** will always perform the operation that you developed them to do. **Mappers** will receive the data, perform some transformation and pass the objects to Ingestors.
 
-Ingestor will the responsible to know how to write the data into the database. Right now, to handle items that were removed from the Cloud (AWS for now) we are saving everything into a temporary table to perform a `NOT IN` operation on SQLite. If something that is not there on the AWS's list anymore, is marked as `DELETED` on the database.
+**Ingestors** are the responsible to know how to write the data into the database. Right now, to handle items that were removed from the Cloud (AWS for now) we are saving everything into a temporary table to perform a `NOT IN` operation on SQLite against the existing data. If something that is not there on the AWS's list anymore, they are marked as `DELETED` on the database (resources table).
 
 **We'll might have some performance issues in the future, so need to keep the eyes on this topic here.**
 
