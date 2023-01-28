@@ -31,7 +31,7 @@ module.exports.ingest = async function (data) {
 
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
-        db.exec(`INSERT INTO "${temporaryTable}" VALUES (\"${obj.Id}\");`)
+        db.exec(`INSERT INTO "${temporaryTable}" VALUES ('${obj.Id}');`)
     }
 
     const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}") and "Type" = '${data.type}';`
