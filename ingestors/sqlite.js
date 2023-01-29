@@ -23,7 +23,7 @@ module.exports.ingest = async function (data) {
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
         db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', ${await nullable(obj.Team)}, ${await nullable(obj.Comments)}, CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
-            if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's contraint error we already expect that!
+            if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's SQLITE_CONSTRAINT error we already expect that!
                 console.log(err)
         })
     }
