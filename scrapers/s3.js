@@ -14,20 +14,16 @@ module.exports.scrape = async function () {
 
         for (let i = 0; i < result.Buckets.length; i++) {
             const obj = result.Buckets[i]
-            try {
-                obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise()
-            } catch (e) {
-                obj.Encryption = e.code
-            }
+            obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise()
+            obj.Tags = s3.getBucketTagging({ Bucket: obj.Name }).promise()
             data.items.push(obj)
+
             promises.push(obj.Encryption)
+            promises.push(obj.Tags)
         }
     } while (params.NextToken)
     await Promise.allSettled(promises)
-    data.items.forEach(b => b.Encryption.then((r) => {
-        b.Encryption = r
-    }, (e) => {
-        b.Encryption = e.code
-    }))
+    data.items.forEach(b => b.Encryption.then((r) => { b.Encryption = r }, (e) => { b.Encryption = e.code }))
+    data.items.forEach(b => b.Tags.then((r) => { b.Tags = r.TagSet }, (e) => { b.Tags = e.code }))
     return data
 }
