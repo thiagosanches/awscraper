@@ -11,18 +11,18 @@ async function nullable(column) {
 module.exports.ingest = async function (data) {
     console.log("💿 Ingesting received data!")
     db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
-        "Id"        TEXT NOT NULL,
-        "Type"      TEXT,
-        "Status"	TEXT NOT NULL,
-        "Team"      TEXT,
-        "Comments"	TEXT,
-        "LastModified" TEXT NOT NULL,
-        "RawObj"	TEXT,
+        "Id"            TEXT NOT NULL,
+        "Type"          TEXT NOT NULL,
+        "Status"	    TEXT NOT NULL,
+        "Team"          TEXT,
+        "Comments"	    TEXT,
+        "LastModified"  TEXT NOT NULL,
+        "RawObj"	    TEXT NOT NULL,
         PRIMARY KEY("Id"));`)
 
     for (let i = 0; i < data.items.length; i++) {
         const obj = data.items[i]
-        db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', '${await nullable(obj.Team)}', '${await nullable(obj.Comments)}', CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
+        db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', ${await nullable(obj.Team)}, ${await nullable(obj.Comments)}, CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
             if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's contraint error we already expect that!
                 console.log(err)
         })
