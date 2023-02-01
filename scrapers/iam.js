@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk')
 
 module.exports.scrape = async function () {
-    console.log("⚙️ Scrapping EC2 data!")
+    console.log("⚙️ Scrapping IAM data!")
 
     const iam = new AWS.IAM({ apiVersion: '2010-05-08' })
     const data = { type: 'iam', items: [] }
