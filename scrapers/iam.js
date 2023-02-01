@@ -4,7 +4,7 @@ module.exports.scrape = async function () {
     console.log("⚙️ Scrapping IAM data!")
 
     const iam = new AWS.IAM({ apiVersion: '2010-05-08' })
-    const data = { type: 'iam', items: [] }
+    const data = { type: 'iam-users', items: [] }
     const params = { Marker: null }
     const promises = []
 
