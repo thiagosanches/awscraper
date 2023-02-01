@@ -10,9 +10,7 @@ module.exports.scrape = async function () {
     do {
         const result = await lambda.listFunctions(params).promise()
         params.Marker = result.NextMarker
-        console.log(result)
         result.Functions.forEach(i => data.items.push(i))
-    } while (params.Marker)
-    
+    } while (params.Marker)    
     return data
 }
