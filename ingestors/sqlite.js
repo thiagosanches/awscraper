@@ -46,7 +46,7 @@ module.exports.ingest = async function (data) {
         db.exec(`INSERT INTO "${temporaryTable}" VALUES ('${obj.Id}');`);
     }
 
-    const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}") and "Type" = '${data.type}';`;
+    const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}" WHERE "Status" = 'LIVE') and "Type" = '${data.type}';`;
     db.exec(updateDeletedItemsSql);
 
     // remove the temp table.
