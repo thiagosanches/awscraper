@@ -13,8 +13,8 @@ const s3Mapper = require('./mappers/s3')
 const lambda = require('./scrapers/lambda')
 const lambdaMapper = require('./mappers/lambda');
 
-const iam = require('./scrapers/iam')
-const iamMapper = require('./mappers/iam');
+const iamUsers = require('./scrapers/iamUsers')
+const iamUsersMapper = require('./mappers/iamUsers');
 
 try {
     (async () => {
@@ -22,7 +22,7 @@ try {
         sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape()))
         sqlite.ingest(await s3Mapper.map(await s3.scrape()))
         sqlite.ingest(await lambdaMapper.map(await lambda.scrape()))
-        sqlite.ingest(await iamMapper.map(await iam.scrape()))
+        sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape()))
     })()
 } catch (e) {
     console.error(e.message)

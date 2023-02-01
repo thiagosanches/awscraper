@@ -36,7 +36,7 @@ module.exports.ingest = async function (data) {
     //so we need to remove it or mark it as 'DELETED' and not 'LIVE' anymore.
     const d = new Date()
     const formattedDate = ("0" + d.getDate()).slice(-2) + ("0" + (d.getMonth() + 1)).slice(-2) + d.getFullYear() + ("0" + d.getHours()).slice(-2) + ("0" + d.getMinutes()).slice(-2);
-    const temporaryTable = `${data.type}_${formattedDate}`
+    const temporaryTable = `${data.type.replace("-", "")}_${formattedDate}`
     const createTemporaryTable = `CREATE TABLE "${temporaryTable}" ("Id" TEXT NOT NULL);`
     db.exec(createTemporaryTable)
 
