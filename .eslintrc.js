@@ -24,6 +24,11 @@ module.exports = {
         ],
         'no-console': 'off',
         'no-trailing-spaces': 'error',
+        'no-await-in-loop': 'off',
+        'func-names': 'off',
+        'no-param-reassign': [
+            'error', { props: false },
+        ],
     },
     globals: {
         describe: false,

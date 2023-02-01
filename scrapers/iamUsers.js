@@ -11,7 +11,7 @@ module.exports.scrape = async function () {
     do {
         const result = await iam.listUsers(params).promise();
         params.Marker = result.Marker;
-        for (let i = 0; i < result.Users.length; i++) {
+        for (let i = 0; i < result.Users.length; i += 1) {
             const obj = result.Users[i];
             obj.AccessKeys = iam.listAccessKeys({ UserName: obj.UserName }).promise();
             data.items.push(obj);
@@ -19,6 +19,10 @@ module.exports.scrape = async function () {
         }
     } while (params.Marker);
     await Promise.allSettled(promises);
-    data.items.forEach((b) => b.AccessKeys.then((r) => { b.AccessKeys = r.AccessKeyMetadata; }, (e) => { b.AccessKeys = e.code; }));
+    data.items.forEach((b) => b.AccessKeys.then((r) => {
+        b.AccessKeys = r.AccessKeyMetadata;
+    }, (e) => {
+        b.AccessKeys = e.code;
+    }));
     return data;
 };
