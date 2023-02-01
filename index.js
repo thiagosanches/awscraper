@@ -10,11 +10,15 @@ const ec2Mapper = require('./mappers/ec2');
 const s3 = require('./scrapers/s3')
 const s3Mapper = require('./mappers/s3')
 
+const lambda = require('./scrapers/lambda')
+const lambdaMapper = require('./mappers/lambda');
+
 try {
     (async () => {
         sqlite.ingest(await ec2Mapper.map(await ec2.scrape()))
         sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape()))
         sqlite.ingest(await s3Mapper.map(await s3.scrape()))
+        sqlite.ingest(await lambdaMapper.map(await lambda.scrape()))
     })()
 } catch (e) {
     console.error(e.message)
