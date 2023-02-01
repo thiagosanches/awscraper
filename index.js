@@ -1,20 +1,20 @@
-const process = require('process');
-const sqlite = require('./ingestors/sqlite');
+const process = require('process')
+const sqlite = require('./ingestors/sqlite')
 
-const cloudfront = require('./scrapers/cloudfront');
-const cloudfrontMapper = require('./mappers/cloudfront');
+const cloudfront = require('./scrapers/cloudfront')
+const cloudfrontMapper = require('./mappers/cloudfront')
 
 const ec2 = require('./scrapers/ec2')
-const ec2Mapper = require('./mappers/ec2');
+const ec2Mapper = require('./mappers/ec2')
 
 const s3 = require('./scrapers/s3')
 const s3Mapper = require('./mappers/s3')
 
 const lambda = require('./scrapers/lambda')
-const lambdaMapper = require('./mappers/lambda');
+const lambdaMapper = require('./mappers/lambda')
 
 const iamUsers = require('./scrapers/iamUsers')
-const iamUsersMapper = require('./mappers/iamUsers');
+const iamUsersMapper = require('./mappers/iamUsers')
 
 try {
     (async () => {
