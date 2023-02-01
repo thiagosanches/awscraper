@@ -1,4 +1,4 @@
-# awscraper ⚙️
+# awscraper ⚙️ [![Node.js CI](https://github.com/thiagosanches/awscraper/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/thiagosanches/awscraper/actions/workflows/node.js.yml)
 AWScraper is a backend tool to centralize all the cloud (AWS for now) data that we might need in order to make them part of an **inventory**. 
 
 We can also add some custom data for any resource to make it easy to search them. In the future, there will be a front-end application that will read the database in order to display the information in an easy way for any non-technical user.
