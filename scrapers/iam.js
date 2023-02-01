@@ -15,13 +15,10 @@ module.exports.scrape = async function () {
             const obj = result.Users[i]
             obj.AccessKeys = iam.listAccessKeys({ UserName: obj.UserName }).promise()
             data.items.push(obj)
-            
             promises.push(obj.AccessKeys)
-
         }
     } while (params.Marker)
     await Promise.allSettled(promises)
     data.items.forEach(b => b.AccessKeys.then((r) => { b.AccessKeys = r.AccessKeyMetadata }, (e) => { b.AccessKeys = e.code }))
-
     return data
 }
