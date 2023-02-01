@@ -25,6 +25,10 @@ module.exports.ingest = async function (data) {
         db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', ${await nullable(obj.Team)}, ${await nullable(obj.Comments)}, CURRENT_TIMESTAMP, '${obj.RawObj}');`, err => {
             if (err && err.code !== 'SQLITE_CONSTRAINT') // If it's SQLITE_CONSTRAINT error we already expect that!
                 console.log(err)
+            else if (err.code === 'SQLITE_CONSTRAINT') {
+                //let's try to update the existing object!
+                db.exec(`UPDATE "resources" SET "LastModified" = CURRENT_TIMESTAMP, "RawObj" = '${obj.RawObj}' WHERE "Id" = '${obj.Id}'`)
+            }
         })
     }
 
