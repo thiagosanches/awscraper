@@ -66,10 +66,10 @@ You can add more scrapers into this project to increase the capacity of this too
 Update the [index.js](./index.js) file, for example:
 
 ```javascript
-const route53 = require('./scrapers/route53')
+const route53 = require('./scrapers/route53');
 const route53Mapper = require('./mappers/route53');
 ...
-sqlite.ingest(await route53Mapper.map(await route53.scrape()))
+sqlite.ingest(await route53Mapper.map(await route53.scrape()));
 ...
 ```
 
