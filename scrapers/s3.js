@@ -1,29 +1,29 @@
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk');
 
 module.exports.scrape = async function () {
-    console.log("⚙️ Scrapping S3 data!")
+    console.log('⚙️ Scrapping S3 data!');
 
     const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
-    const data = { type: 's3', items: [] }
-    const params = { NextToken: null }
-    const promises = []
+    const data = { type: 's3', items: [] };
+    const params = { NextToken: null };
+    const promises = [];
 
     do {
-        const result = await s3.listBuckets(params).promise()
-        params.NextToken = result.NextToken
+        const result = await s3.listBuckets(params).promise();
+        params.NextToken = result.NextToken;
 
         for (let i = 0; i < result.Buckets.length; i++) {
-            const obj = result.Buckets[i]
-            obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise()
-            obj.Tags = s3.getBucketTagging({ Bucket: obj.Name }).promise()
-            data.items.push(obj)
+            const obj = result.Buckets[i];
+            obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise();
+            obj.Tags = s3.getBucketTagging({ Bucket: obj.Name }).promise();
+            data.items.push(obj);
 
-            promises.push(obj.Encryption)
-            promises.push(obj.Tags)
+            promises.push(obj.Encryption);
+            promises.push(obj.Tags);
         }
-    } while (params.NextToken)
-    await Promise.allSettled(promises)
-    data.items.forEach(b => b.Encryption.then((r) => { b.Encryption = r }, (e) => { b.Encryption = e.code }))
-    data.items.forEach(b => b.Tags.then((r) => { b.Tags = r.TagSet }, (e) => { b.Tags = e.code }))
-    return data
-}
+    } while (params.NextToken);
+    await Promise.allSettled(promises);
+    data.items.forEach((b) => b.Encryption.then((r) => { b.Encryption = r; }, (e) => { b.Encryption = e.code; }));
+    data.items.forEach((b) => b.Tags.then((r) => { b.Tags = r.TagSet; }, (e) => { b.Tags = e.code; }));
+    return data;
+};
