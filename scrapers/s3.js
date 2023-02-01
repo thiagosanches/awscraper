@@ -22,7 +22,7 @@ module.exports.scrape = async function () {
             promises.push(obj.Tags);
         }
     } while (params.NextToken);
-    
+
     await Promise.allSettled(promises);
     data.items.forEach((b) => b.Encryption.then(
         (r) => {
