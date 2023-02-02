@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const mapper = require('../mappers/cloudfront')
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping CloudFront data!');
@@ -18,5 +19,5 @@ module.exports.scrape = async function (account, credentialsParams) {
         }
     } while (params.Marker);
 
-    return data;
+    return await mapper.map(data);
 };
