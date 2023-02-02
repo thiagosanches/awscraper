@@ -21,12 +21,22 @@ const awsCredentials = require('./utils/awsCredentials');
 
 try {
     (async () => {
-        const accounts = await awsOrganization.getChildrenAccounts();
+        const accounts = [];
+
+        // Someone wants to scrape just one account instead of an entire organization.
+        if (process.env.AWSCRAPER_ACCOUNT_ID) {
+            accounts.push({
+                Id: process.env.AWSCRAPER_ACCOUNT_ID,
+                Name: process.env.AWSCRAPER_ACCOUNT_NAME,
+            });
+        } else {
+            accounts.push(await awsOrganization.getChildrenAccounts());
+        }
+
         for (let i = 0; i < accounts.length; i += 1) {
             const account = accounts[i];
-            if (account.Id === 'XXXXX') break;
-
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
+
             sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
             sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
             sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
