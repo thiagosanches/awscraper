@@ -71,9 +71,24 @@ Update the [index.js](./index.js) file, for example:
 const route53 = require('./scrapers/route53');
 const route53Mapper = require('./mappers/route53');
 ...
-sqlite.ingest(await route53Mapper.map(await route53.scrape()));
+sqlite.ingest(await route53Mapper.map(await route53.scrape(...)));
 ...
 ```
 
 Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.js](./scrapers/cloudfront.js)) when creating your new feature. They are not perfect, but it works (at least for now haha)!
 
+## How to execute?
+- Run `npm install`.
+
+### Single Account
+- If you are going to work on a single account export the `AWS_ACCESS_KEY_ID`,`AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` variables to your bash session. Also, export these additional environment variables to give to the AWS account a Id and a Name: `AWSCRAPER_ACCOUNT_ID` and `AWSCRAPER_ACCOUNT_NAME`.
+
+### Multiple Accounts
+- If you are going to work on multiple accounts through AWS Organizations, you just need to export the profile and/or the secrets from the Root Account and you should be good :).
+
+### Finally, execute the application
+Run `AWS_REGION=us-east-1 node index.js`.
+
+*We are going to add a logic that iterates accross the available regions, in order to avoid passing it as an env variable!*
+
+You should see a `database.db` file being created.
