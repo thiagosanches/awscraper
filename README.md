@@ -71,7 +71,7 @@ Update the [index.js](./index.js) file, for example:
 const route53 = require('./scrapers/route53');
 const route53Mapper = require('./mappers/route53');
 ...
-sqlite.ingest(await route53Mapper.map(await route53.scrape()));
+sqlite.ingest(await route53Mapper.map(await route53.scrape(...)));
 ...
 ```
 
@@ -87,6 +87,6 @@ Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.
 - If you are going to work on multiple accounts through AWS Organizations, you just need to export the profile and/or the secrets from the Root Account and you should be good :).
 
 ### Finally, execute the application
-Run `AWS_REGION=us-east-1 node index.js
+Run `AWS_REGION=us-east-1 node index.js`.
 
 You should see a `database.db` file being created.
