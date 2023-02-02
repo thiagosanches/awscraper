@@ -45,5 +45,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         },
     ));
 
-    return await mapper.map(data);
+    const result = await mapper.map(data);
+    return result;
 };
