@@ -5,7 +5,7 @@ module.exports.getChildrenAccounts = async function () {
 
     const accounts = [];
     const params = { NextToken: null };
-    const organization = new AWS.Organizations({ apiVersion: '2016-11-28' });
+    const organization = new AWS.Organizations({ apiVersion: '2016-11-28', region: 'us-east-1' });
     do {
         const result = await organization.listAccounts(params).promise();
         accounts.push(...result.Accounts);
