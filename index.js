@@ -2,8 +2,6 @@ const process = require('process');
 const sqlite = require('./ingestors/sqlite');
 
 const cloudfront = require('./scrapers/cloudfront');
-const cloudfrontMapper = require('./mappers/cloudfront');
-
 const ec2 = require('./scrapers/ec2');
 const s3 = require('./scrapers/s3');
 const lambda = require('./scrapers/lambda');
