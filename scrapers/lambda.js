@@ -1,9 +1,9 @@
 const AWS = require('aws-sdk');
 
-module.exports.scrape = async function () {
+module.exports.scrape = async function (credentialsParams) {
     console.log('⚙️ Scrapping Lambda data!');
 
-    const lambda = new AWS.Lambda({ apiVersion: '2015-03-31' });
+    const lambda = new AWS.Lambda({ apiVersion: '2015-03-31', ...credentialsParams });
     const data = { type: 'lambda', items: [] };
     const params = { Marker: null };
 

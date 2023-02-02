@@ -16,13 +16,23 @@ const lambdaMapper = require('./mappers/lambda');
 const iamUsers = require('./scrapers/iamUsers');
 const iamUsersMapper = require('./mappers/iamUsers');
 
+const awsOrganization = require('./utils/awsOrganization');
+const awsCredentials = require('./utils/awsCredentials');
+
 try {
-    (async () => {     
-        sqlite.ingest(await ec2Mapper.map(await ec2.scrape()));
-        sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape()));
-        sqlite.ingest(await s3Mapper.map(await s3.scrape()));
-        sqlite.ingest(await lambdaMapper.map(await lambda.scrape()));
-        sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape()));
+    (async () => {
+        const accounts = await awsOrganization.getChildrenAccounts();
+        for (let i = 0; i < accounts.length; i += 1) {
+            const obj = accounts[i];
+            if (obj.Id === 'XXXXX') continue;
+            const credentialsParams = await
+            awsCredentials.getTemporaryAWSCredentialsForAccount(obj.Id);
+            sqlite.ingest(await ec2Mapper.map(await ec2.scrape(credentialsParams)));
+            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(credentialsParams)));
+            sqlite.ingest(await s3Mapper.map(await s3.scrape(credentialsParams)));
+            sqlite.ingest(await lambdaMapper.map(await lambda.scrape(credentialsParams)));
+            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(credentialsParams)));
+        }
     })();
 } catch (e) {
     console.error(e.message);

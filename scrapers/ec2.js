@@ -1,9 +1,9 @@
 const AWS = require('aws-sdk');
 
-module.exports.scrape = async function () {
+module.exports.scrape = async function (credentialsParams) {
     console.log('⚙️ Scrapping EC2 data!');
 
-    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
+    const ec2 = new AWS.EC2({ apiVersion: '2016-11-15', ...credentialsParams });
     const data = { type: 'ec2', items: [] };
     const params = { NextToken: null };
 

@@ -1,9 +1,9 @@
 const AWS = require('aws-sdk');
 
-module.exports.scrape = async function () {
+module.exports.scrape = async function (credentialsParams) {
     console.log('⚙️ Scrapping S3 data!');
 
-    const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+    const s3 = new AWS.S3({ apiVersion: '2006-03-01', ...credentialsParams });
     const data = { type: 's3', items: [] };
     const params = { NextToken: null };
     const promises = [];

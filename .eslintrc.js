@@ -29,6 +29,7 @@ module.exports = {
         'no-param-reassign': [
             'error', { props: false },
         ],
+        'no-continue': 'off',
     },
     globals: {
         describe: false,
