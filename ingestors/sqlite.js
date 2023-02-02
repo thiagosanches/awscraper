@@ -38,8 +38,6 @@ module.exports.ingest = async function (data) {
                 CURRENT_TIMESTAMP, 
                 '${obj.RawObj.replaceAll('\'', '\'\'')}'
             );`;
-        console.log(obj)
-        console.log(insert)
         db.exec(insert, (err) => {
             // If it's SQLITE_CONSTRAINT error we already expect that!
             if (err && err.code !== 'SQLITE_CONSTRAINT') {
