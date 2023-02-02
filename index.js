@@ -46,12 +46,13 @@ try {
                 account.Region = region.RegionName;
                 console.log(`🌎 Scrapping from '${account.Region}' region!`);
                 sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
-                sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
-                sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
                 sqlite.ingest(await lambdaMapper.map(await lambda.scrape(account, credentialsParams)));
-                sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
             }
-            console.log('======================================');
+
+            // Scrappers that doesn't need regions.
+            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
+            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
+            sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
         }
     })();
 } catch (e) {
