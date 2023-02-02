@@ -27,6 +27,8 @@ To save the returned data from scrapers we defined a simple table:
 ```sql
 CREATE TABLE IF NOT EXISTS "resources" (
 "Id" TEXT NOT NULL,
+"AccountId" TEXT NOT NULL,
+"AccountName" TEXT NOT NULL,
 "Type" TEXT,
 "Status" TEXT NOT NULL,
 "Team" TEXT,
