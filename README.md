@@ -88,8 +88,6 @@ Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.
 - If you are going to work on multiple accounts through AWS Organizations, you just need to export the profile and/or the secrets from the Root Account and you should be good :).
 
 ### Finally, execute the application
-Run `AWS_REGION=us-east-1 node index.js`.
-
-*We are going to add a logic that iterates accross the available regions, in order to avoid passing it as an env variable! (DONE)*
+Run `node index.js`.
 
 You should see a `database.db` file being created.
