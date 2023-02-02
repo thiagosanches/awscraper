@@ -17,7 +17,7 @@ const iamUsers = require('./scrapers/iamUsers');
 const iamUsersMapper = require('./mappers/iamUsers');
 
 try {
-    (async () => {
+    (async () => {     
         sqlite.ingest(await ec2Mapper.map(await ec2.scrape()));
         sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape()));
         sqlite.ingest(await s3Mapper.map(await s3.scrape()));
