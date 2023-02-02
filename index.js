@@ -46,6 +46,8 @@ try {
             promisses.push(cloudfront.scrape(account, credentialsParams));
             promisses.push(s3.scrape(account, credentialsParams));
         }
+        const result = await Promise.all(promisses);
+        result.forEach((i) => { sqlite.ingest(i) })
     })();
 } catch (e) {
     console.error(e.message);
