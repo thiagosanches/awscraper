@@ -32,7 +32,7 @@ try {
                 Name: process.env.AWSCRAPER_ACCOUNT_NAME,
             });
         } else {
-            accounts.push(await awsOrganization.getChildrenAccounts());
+            accounts.push(... await awsOrganization.getChildrenAccounts());
         }
 
         for (let i = 0; i < accounts.length; i += 1) {
