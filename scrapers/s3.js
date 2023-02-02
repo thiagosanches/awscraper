@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const mapper = require('../mappers/s3')
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping S3 data!');
@@ -44,5 +45,5 @@ module.exports.scrape = async function (account, credentialsParams) {
         },
     ));
 
-    return data;
+    return await mapper.map(data);
 };
