@@ -43,7 +43,7 @@ module.exports.ingest = async function (data) {
                 console.log(err);
             } else if (err && err.code === 'SQLITE_CONSTRAINT') {
                 // let's try to update the existing object!
-                db.exec(`UPDATE "resources" SET "LastModified" = CURRENT_TIMESTAMP, "RawObj" = '${obj.RawObj}' WHERE "Id" = '${obj.Id}'`);
+                db.exec(`UPDATE "resources" SET "LastModified" = CURRENT_TIMESTAMP, "RawObj" = '${obj.RawObj.replaceAll('\'', '\'\'')}' WHERE "Id" = '${obj.Id}'`);
             }
         });
     }
