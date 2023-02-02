@@ -90,6 +90,6 @@ Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.
 ### Finally, execute the application
 Run `AWS_REGION=us-east-1 node index.js`.
 
-*We are going to add a logic that iterates accross the available regions, in order to avoid passing it as an env variable!*
+*We are going to add a logic that iterates accross the available regions, in order to avoid passing it as an env variable! (DONE)*
 
 You should see a `database.db` file being created.
