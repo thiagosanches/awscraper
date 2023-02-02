@@ -16,6 +16,7 @@ const awsRegions = require('./utils/awsRegions');
 try {
     (async () => {
         const accounts = [];
+        const promisses = [];
 
         // Someone wants to scrape just one account instead of an entire organization.
         if (process.env.AWSCRAPER_ACCOUNT_ID) {
@@ -36,8 +37,8 @@ try {
                 const region = regions.Regions[j];
                 account.Region = region.RegionName;
                 console.log(`🌎 Scrapping from '${account.Region}' region!`);
-                sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
-                sqlite.ingest(await lambdaMapper.map(await lambda.scrape(account, credentialsParams)));
+                promisses.push(ec2.scrape(account, credentialsParams));
+                promisses.push(lambda.scrape(account, credentialsParams));
             }
 
             // Scrappers that doesn't need regions.
