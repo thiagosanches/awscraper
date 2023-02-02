@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS "resources" (
 "Id" TEXT NOT NULL,
 "AccountId" TEXT NOT NULL,
 "AccountName" TEXT NOT NULL,
+"Region" TEXT NOT NULL,
 "Type" TEXT,
 "Status" TEXT NOT NULL,
 "Team" TEXT,
