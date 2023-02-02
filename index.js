@@ -42,9 +42,9 @@ try {
             }
 
             // Scrappers that doesn't need regions.
-            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
-            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
-            sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
+            promisses.push(iamUsers.scrape(account, credentialsParams));
+            promisses.push(cloudfront.scrape(account, credentialsParams));
+            promisses.push(s3.scrape(account, credentialsParams));
         }
     })();
 } catch (e) {
