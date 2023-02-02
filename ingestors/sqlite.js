@@ -9,7 +9,7 @@ async function nullable(column) {
 }
 
 module.exports.ingest = async function (data) {
-    console.log('💿 Ingesting received data!');
+    console.log(`💿 Ingesting '${data.type}' ${data.items.length} item(s)!`);
     db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
         "Id"            TEXT NOT NULL,
         "AccountId"     TEXT NOT NULL,
