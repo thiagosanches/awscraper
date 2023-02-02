@@ -3,9 +3,9 @@ const AWS = require('aws-sdk');
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping IAM data!');
 
-    const iam = new AWS.IAM({ apiVersion: '2010-05-08', ...credentialsParams });
+    const iam = new AWS.IAM({ apiVersion: '2010-05-08', region: account.Region, ...credentialsParams });
     const data = {
-        type: 'iam-users', items: [], accountId: account.Id, accountName: account.Name,
+        type: 'iam-users', items: [], accountId: account.Id, accountName: account.Name, region: account.Region,
     };
     const params = { Marker: null };
     const promises = [];

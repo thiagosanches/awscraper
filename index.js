@@ -19,6 +19,8 @@ const iamUsersMapper = require('./mappers/iamUsers');
 const awsOrganization = require('./utils/awsOrganization');
 const awsCredentials = require('./utils/awsCredentials');
 
+const awsRegions = require('./utils/awsRegions');
+
 try {
     (async () => {
         const accounts = [];
@@ -36,12 +38,19 @@ try {
         for (let i = 0; i < accounts.length; i += 1) {
             const account = accounts[i];
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
+            const regions = await awsRegions.getEnabledRegions(account, credentialsParams);
 
-            sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
-            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
-            sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
-            sqlite.ingest(await lambdaMapper.map(await lambda.scrape(account, credentialsParams)));
-            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
+            for (let j = 0; j < regions.Regions.length; j += 1) {
+                const region = regions.Regions[j];
+                account.Region = region.RegionName;
+                console.log(`🌎 Scrapping from '${account.Region}' region!`);
+                sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
+                sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
+                sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
+                sqlite.ingest(await lambdaMapper.map(await lambda.scrape(account, credentialsParams)));
+                sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
+            }
+            console.log('======================================');
         }
     })();
 } catch (e) {
