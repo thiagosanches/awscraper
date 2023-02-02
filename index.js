@@ -40,6 +40,7 @@ try {
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
             const regions = await awsRegions.getEnabledRegions(account, credentialsParams);
 
+            // This will slow down us!!! Need to remove the await calls in order to let them running more asynchronously.
             for (let j = 0; j < regions.Regions.length; j += 1) {
                 const region = regions.Regions[j];
                 account.Region = region.RegionName;
