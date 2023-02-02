@@ -1,14 +1,16 @@
 const process = require('process');
 const sqlite = require('./ingestors/sqlite');
 
+/* scrapers */
 const cloudfront = require('./scrapers/cloudfront');
 const ec2 = require('./scrapers/ec2');
 const s3 = require('./scrapers/s3');
 const lambda = require('./scrapers/lambda');
 const iamUsers = require('./scrapers/iamUsers');
+
+/* utils */
 const awsOrganization = require('./utils/awsOrganization');
 const awsCredentials = require('./utils/awsCredentials');
-
 const awsRegions = require('./utils/awsRegions');
 
 try {
