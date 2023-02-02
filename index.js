@@ -48,8 +48,7 @@ try {
         }
         const result = await Promise.all(promisses);
         result.forEach((i) => {
-            if (i.items && i.items.length > 0)
-                sqlite.ingest(i);
+            if (i.items && i.items.length > 0) sqlite.ingest(i);
         });
     })();
 } catch (e) {
