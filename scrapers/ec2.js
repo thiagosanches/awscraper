@@ -16,6 +16,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         result.Reservations.forEach((i) => data.items.push(...i.Instances));
     } while (params.NextToken);
 
-   const result = await mapper.map(data);
-   return result;
+    const result = await mapper.map(data);
+    return result;
 };
