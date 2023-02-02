@@ -30,6 +30,7 @@ module.exports = {
             'error', { props: false },
         ],
         'no-continue': 'off',
+        'max-len': 'off',
     },
     globals: {
         describe: false,

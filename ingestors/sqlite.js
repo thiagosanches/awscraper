@@ -12,6 +12,8 @@ module.exports.ingest = async function (data) {
     console.log('💿 Ingesting received data!');
     db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
         "Id"            TEXT NOT NULL,
+        "AccountId"     TEXT NOT NULL,
+        "AccountName"   TEXT NOT NULL,
         "Type"          TEXT NOT NULL,
         "Status"        TEXT NOT NULL,
         "Team"          TEXT,
@@ -22,9 +24,22 @@ module.exports.ingest = async function (data) {
 
     for (let i = 0; i < data.items.length; i += 1) {
         const obj = data.items[i];
-        db.exec(`INSERT INTO "resources" VALUES ('${obj.Id}', '${data.type}', '${obj.Status}', ${await nullable(obj.Team)}, ${await nullable(obj.Comments)}, CURRENT_TIMESTAMP, '${obj.RawObj}');`, (err) => {
+        const insert = `
+            INSERT INTO "resources" VALUES (
+                '${obj.Id}', 
+                '${obj.AccountId}', 
+                '${obj.AccountName}', 
+                '${data.type}', 
+                '${obj.Status}', 
+                ${await nullable(obj.Team)}, 
+                ${await nullable(obj.Comments)}, 
+                CURRENT_TIMESTAMP, 
+                '${obj.RawObj.replaceAll('\'', '\'\'')}'
+            );`;
+        db.exec(insert, (err) => {
             // If it's SQLITE_CONSTRAINT error we already expect that!
             if (err && err.code !== 'SQLITE_CONSTRAINT') {
+                console.log(insert);
                 console.log(err);
             } else if (err && err.code === 'SQLITE_CONSTRAINT') {
                 // let's try to update the existing object!
@@ -46,7 +61,12 @@ module.exports.ingest = async function (data) {
         db.exec(`INSERT INTO "${temporaryTable}" VALUES ('${obj.Id}');`);
     }
 
-    const updateDeletedItemsSql = `UPDATE "resources" SET "Status" = 'DELETED', "LastModified" = CURRENT_TIMESTAMP where Id NOT IN (SELECT Id FROM "${temporaryTable}" WHERE "Status" = 'LIVE') and "Type" = '${data.type}';`;
+    const updateDeletedItemsSql = `
+        UPDATE "resources" 
+        SET "Status" = 'DELETED', 
+        "LastModified" = CURRENT_TIMESTAMP 
+        WHERE "Id" NOT IN (SELECT Id FROM "${temporaryTable}" WHERE "Status" = 'LIVE' AND "AccountId" = '${data.AccountId}') 
+        AND "Type" = '${data.type}' AND "AccountId" = '${data.AccountId}';`;
     db.exec(updateDeletedItemsSql);
 
     // remove the temp table.

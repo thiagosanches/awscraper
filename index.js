@@ -23,15 +23,15 @@ try {
     (async () => {
         const accounts = await awsOrganization.getChildrenAccounts();
         for (let i = 0; i < accounts.length; i += 1) {
-            const obj = accounts[i];
-            if (obj.Id === 'XXXXX') continue;
-            const credentialsParams = await
-            awsCredentials.getTemporaryAWSCredentialsForAccount(obj.Id);
-            sqlite.ingest(await ec2Mapper.map(await ec2.scrape(credentialsParams)));
-            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(credentialsParams)));
-            sqlite.ingest(await s3Mapper.map(await s3.scrape(credentialsParams)));
-            sqlite.ingest(await lambdaMapper.map(await lambda.scrape(credentialsParams)));
-            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(credentialsParams)));
+            const account = accounts[i];
+            if (account.Id === 'XXXXX') break;
+
+            const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
+            sqlite.ingest(await ec2Mapper.map(await ec2.scrape(account, credentialsParams)));
+            sqlite.ingest(await cloudfrontMapper.map(await cloudfront.scrape(account, credentialsParams)));
+            sqlite.ingest(await s3Mapper.map(await s3.scrape(account, credentialsParams)));
+            sqlite.ingest(await lambdaMapper.map(await lambda.scrape(account, credentialsParams)));
+            sqlite.ingest(await iamUsersMapper.map(await iamUsers.scrape(account, credentialsParams)));
         }
     })();
 } catch (e) {
