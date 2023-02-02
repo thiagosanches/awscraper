@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const mapper = require('../mappers/lambda')
+const mapper = require('../mappers/lambda');
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping Lambda data!');
@@ -15,6 +15,7 @@ module.exports.scrape = async function (account, credentialsParams) {
         params.Marker = result.NextMarker;
         result.Functions.forEach((i) => data.items.push(i));
     } while (params.Marker);
-    
-    return await mapper.map(data);
+
+    const result = await mapper.map(data);
+    return result;
 };

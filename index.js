@@ -47,7 +47,7 @@ try {
             promisses.push(s3.scrape(account, credentialsParams));
         }
         const result = await Promise.all(promisses);
-        result.forEach((i) => { sqlite.ingest(i) })
+        result.forEach((i) => { sqlite.ingest(i); });
     })();
 } catch (e) {
     console.error(e.message);

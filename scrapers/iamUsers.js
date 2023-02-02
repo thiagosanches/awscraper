@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const mapper = require('../mappers/iamUsers')
+const mapper = require('../mappers/iamUsers');
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping IAM data!');
@@ -27,6 +27,7 @@ module.exports.scrape = async function (account, credentialsParams) {
     }, (e) => {
         b.AccessKeys = e.code;
     }));
-    
-    return await mapper.map(data);
+
+    const result = await mapper.map(data);
+    return result;
 };

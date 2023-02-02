@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const mapper = require('../mappers/ec2')
+const mapper = require('../mappers/ec2');
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️ Scrapping EC2 data!');
@@ -16,5 +16,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         result.Reservations.forEach((i) => data.items.push(...i.Instances));
     } while (params.NextToken);
 
-    return await mapper.map(data);
+   const result = await mapper.map(data);
+   return result;
 };
