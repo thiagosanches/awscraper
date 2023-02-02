@@ -4,7 +4,7 @@ const baseObject = require('../common/baseObject');
 module.exports.map = async function (data) {
     baseObject.AccountId = data.accountId;
     baseObject.AccountName = data.accountName;
-    baseObject.Region = data.region;
+    baseObject.ResourceRegion = data.region;
     return {
         type: data.type,
         items: _.map(data.items, (m) => ({

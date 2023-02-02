@@ -1,7 +1,7 @@
 module.exports = {
     AccountId: null,
     AccountName: null,
-    Region: 'N/A',
+    ResourceRegion: 'N/A',
     Team: null,
     Comments: null,
     Status: 'LIVE',
