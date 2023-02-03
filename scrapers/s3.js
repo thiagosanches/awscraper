@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const mapper = require('../mappers/s3');
 
 module.exports.scrape = async function (account, credentialsParams) {
-    console.log('⚙️ Scrapping S3 data!');
+    console.log('⚙️  Scrapping S3 data!');
 
     const s3 = new AWS.S3({ apiVersion: '2006-03-01', ...credentialsParams });
     const data = {

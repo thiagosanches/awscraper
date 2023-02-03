@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const mapper = require('../mappers/ec2');
 
 module.exports.scrape = async function (account, credentialsParams) {
-    console.log('⚙️ Scrapping EC2 data!');
+    console.log('⚙️  Scrapping EC2 data!');
 
     const ec2 = new AWS.EC2({ apiVersion: '2016-11-15', region: account.Region, ...credentialsParams });
     const data = {

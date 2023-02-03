@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const mapper = require('../mappers/cloudfront');
 
 module.exports.scrape = async function (account, credentialsParams) {
-    console.log('⚙️ Scrapping CloudFront data!');
+    console.log('⚙️  Scrapping CloudFront data!');
 
     const cloudfront = new AWS.CloudFront({ apiVersion: '2020-05-31', ...credentialsParams });
     const data = {

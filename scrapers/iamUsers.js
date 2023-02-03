@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const mapper = require('../mappers/iamUsers');
 
 module.exports.scrape = async function (account, credentialsParams) {
-    console.log('⚙️ Scrapping IAM data!');
+    console.log('⚙️  Scrapping IAM data!');
 
     const iam = new AWS.IAM({ apiVersion: '2010-05-08', ...credentialsParams });
     const data = {
