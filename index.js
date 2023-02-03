@@ -11,6 +11,7 @@ const route53 = require('./scrapers/route53');
 const ebs = require('./scrapers/ebs');
 const dynamoDb = require('./scrapers/dynamoDb');
 const rds = require('./scrapers/rds');
+const elasticBeanstalk = require('./scrapers/elasticBeanstalk');
 
 /* utils */
 const awsOrganization = require('./utils/awsOrganization');
@@ -48,6 +49,7 @@ try {
                 promises.push(ebs.scrape(account, credentialsParams));
                 promises.push(dynamoDb.scrape(account, credentialsParams));
                 promises.push(rds.scrape(account, credentialsParams));
+                promises.push(elasticBeanstalk.scrape(account, credentialsParams));
             }
 
             // Scrapers that doesn't need regions.
