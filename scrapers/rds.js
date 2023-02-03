@@ -17,8 +17,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         if (result.DBInstances) {
             data.items.push(...result.DBInstances);
         }
-
-        console.log(data.items)
     } while (params.Marker);
 
     const result = await mapper.map(data);
