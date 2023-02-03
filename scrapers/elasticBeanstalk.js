@@ -15,7 +15,7 @@ module.exports.scrape = async function (account, credentialsParams) {
         params.NextToken = result.NextToken;
 
         if (result.Environments) {
-            data.items.push(...result.Environments)
+            data.items.push(...result.Environments);
         }
     } while (params.NextToken);
 
