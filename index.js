@@ -8,6 +8,7 @@ const s3 = require('./scrapers/s3');
 const lambda = require('./scrapers/lambda');
 const iamUsers = require('./scrapers/iamUsers');
 const route53 = require('./scrapers/route53');
+const ebs = require('./scrapers/ebs');
 
 /* utils */
 const awsOrganization = require('./utils/awsOrganization');
@@ -42,6 +43,7 @@ try {
                 console.log(`🌎 Scrapping from '${account.Region}' region!`);
                 promises.push(ec2.scrape(account, credentialsParams));
                 promises.push(lambda.scrape(account, credentialsParams));
+                promises.push(ebs.scrape(account, credentialsParams));
             }
 
             // Scrapers that doesn't need regions.
