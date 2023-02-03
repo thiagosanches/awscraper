@@ -44,7 +44,7 @@ try {
                 promises.push(lambda.scrape(account, credentialsParams));
             }
 
-            // Scrappers that doesn't need regions.
+            // Scrapers that doesn't need regions.
             promises.push(iamUsers.scrape(account, credentialsParams));
             promises.push(cloudfront.scrape(account, credentialsParams));
             promises.push(s3.scrape(account, credentialsParams));
