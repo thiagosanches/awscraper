@@ -71,7 +71,7 @@ Update the [index.js](./index.js) file, for example:
 ```javascript
 const route53 = require('./scrapers/route53');
 ...
-promisses.push(route53.scrape(...));
+promises.push(route53.scrape(...));
 ...
 ```
 

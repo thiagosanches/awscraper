@@ -7,6 +7,7 @@ const ec2 = require('./scrapers/ec2');
 const s3 = require('./scrapers/s3');
 const lambda = require('./scrapers/lambda');
 const iamUsers = require('./scrapers/iamUsers');
+const route53 = require('./scrapers/route53');
 
 /* utils */
 const awsOrganization = require('./utils/awsOrganization');
@@ -16,7 +17,7 @@ const awsRegions = require('./utils/awsRegions');
 try {
     (async () => {
         const accounts = [];
-        const promisses = [];
+        const promises = [];
 
         // Someone wants to scrape just one account instead of an entire organization.
         if (process.env.AWSCRAPER_ACCOUNT_ID) {
@@ -31,6 +32,7 @@ try {
         for (let i = 0; i < accounts.length; i += 1) {
             console.log(`👷 Working on account ${i + 1}/${accounts.length}!`);
             const account = accounts[i];
+
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
             const regions = await awsRegions.getEnabledRegions(account, credentialsParams);
 
@@ -38,16 +40,17 @@ try {
                 const region = regions.Regions[j];
                 account.Region = region.RegionName;
                 console.log(`🌎 Scrapping from '${account.Region}' region!`);
-                promisses.push(ec2.scrape(account, credentialsParams));
-                promisses.push(lambda.scrape(account, credentialsParams));
+                promises.push(ec2.scrape(account, credentialsParams));
+                promises.push(lambda.scrape(account, credentialsParams));
             }
 
             // Scrappers that doesn't need regions.
-            promisses.push(iamUsers.scrape(account, credentialsParams));
-            promisses.push(cloudfront.scrape(account, credentialsParams));
-            promisses.push(s3.scrape(account, credentialsParams));
+            promises.push(iamUsers.scrape(account, credentialsParams));
+            promises.push(cloudfront.scrape(account, credentialsParams));
+            promises.push(s3.scrape(account, credentialsParams));
+            promises.push(route53.scrape(account, credentialsParams));
         }
-        const result = await Promise.all(promisses);
+        const result = await Promise.all(promises);
         result.forEach((i) => {
             if (i.items && i.items.length > 0) sqlite.ingest(i);
         });
