@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const mapper = require('../mappers/elasticbeanstalk');
+const mapper = require('../mappers/elasticBeanstalk');
 
 module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️  Scrapping ElasticBeanstalk data!');
