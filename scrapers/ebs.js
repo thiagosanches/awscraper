@@ -15,8 +15,6 @@ module.exports.scrape = async function (account, credentialsParams) {
 
         params.NextToken = result.NextToken;
         result.Volumes.forEach((i) => data.items.push(i));
-
-        console.log(data.items);
     } while (params.NextToken);
 
     const result = await mapper.map(data);
