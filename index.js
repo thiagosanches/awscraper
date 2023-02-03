@@ -29,8 +29,7 @@ try {
         }
 
         for (let i = 0; i < accounts.length; i += 1) {
-
-            console.log(`👷 Working on account ${i + 1}/${accounts.length}!`)
+            console.log(`👷 Working on account ${i + 1}/${accounts.length}!`);
             const account = accounts[i];
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
             const regions = await awsRegions.getEnabledRegions(account, credentialsParams);
