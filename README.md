@@ -11,6 +11,18 @@ We are also planning to add a logic that will create a relationship between the 
 
 Right now, we are saving the data into a SQLite database and managing it through [SQLiteStudio](https://www.sqlitestudio.pl/).
 
+## What are the supported resources now?
+- CloudFront
+- DynamoDB
+- EBS (Volumes)
+- EC2
+- ElasticBeanstalk
+- IAM (+ Info about Keys)
+- Lambda
+- RDS
+- Route 53 (ResourceRecords)
+- S3
+
 ## Overview
 There are 3 main components in the application:
 - **Ingestors**: It's responsible to write the data into the database. At this moment, we are trying to define a model that fits for ALL.
