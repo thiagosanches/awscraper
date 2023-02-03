@@ -17,7 +17,7 @@ Right now, we are saving the data into a SQLite database and managing it through
 - EBS (Volumes)
 - EC2
 - ElasticBeanstalk
-- IAM (+ Info about Keys)
+- IAM + additional information about AccessKeys
 - Lambda
 - RDS
 - Route 53 (ResourceRecords)
