@@ -13,7 +13,7 @@ module.exports.scrape = async function (account, credentialsParams) {
     do {
         const result = await ec2.describeSecurityGroups(params).promise();
         params.NextToken = result.NextToken;
-        data.items.push(...result.SecurityGroups)
+        data.items.push(...result.SecurityGroups);
     } while (params.NextToken);
 
     const result = await mapper.map(data);
