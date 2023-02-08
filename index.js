@@ -15,6 +15,7 @@ const elasticBeanstalk = require('./scrapers/elasticBeanstalk');
 const sg = require('./scrapers/sg');
 const sns = require('./scrapers/sns');
 const sqs = require('./scrapers/sqs');
+const apiGateway = require('./scrapers/apiGateway');
 
 /* utils */
 const awsOrganization = require('./utils/awsOrganization');
@@ -56,6 +57,7 @@ try {
                 promises.push(sg.scrape(account, credentialsParams));
                 promises.push(sns.scrape(account, credentialsParams));
                 promises.push(sqs.scrape(account, credentialsParams));
+                promises.push(apiGateway.scrape(account, credentialsParams));
             }
 
             // Scrapers that doesn't need regions.
