@@ -9,7 +9,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         type: 'iam-users', items: [], accountId: account.Id, accountName: account.Name,
     };
     const params = { Marker: null };
-    const promises = [];
 
     do {
         const result = await iam.listUsers(params).promise();
@@ -18,15 +17,18 @@ module.exports.scrape = async function (account, credentialsParams) {
             const obj = result.Users[i];
             obj.AccessKeys = iam.listAccessKeys({ UserName: obj.UserName }).promise();
             data.items.push(obj);
-            promises.push(obj.AccessKeys);
         }
     } while (params.Marker);
-    await Promise.allSettled(promises);
-    data.items.forEach((b) => b.AccessKeys.then((r) => {
-        b.AccessKeys = r.AccessKeyMetadata;
-    }, (e) => {
-        b.AccessKeys = e.code;
-    }));
+
+    for (let i = 0; i < data.items.length; i += 1) {
+        const obj = data.items[i];
+        const accessKeys = await obj.AccessKeys;
+        if (accessKeys.AccessKeyMetadata) {
+            obj.AccessKeys = accessKeys.AccessKeyMetadata;
+        } else {
+            obj.AccessKeys = [];
+        }
+    }
 
     const result = await mapper.map(data);
     return result;
