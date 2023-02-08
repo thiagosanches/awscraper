@@ -9,7 +9,6 @@ module.exports.scrape = async function (account, credentialsParams) {
         type: 's3', items: [], accountId: account.Id, accountName: account.Name,
     };
     const params = { NextToken: null };
-    const promises = [];
 
     do {
         const result = await s3.listBuckets(params).promise();
@@ -18,32 +17,24 @@ module.exports.scrape = async function (account, credentialsParams) {
         for (let i = 0; i < result.Buckets.length; i += 1) {
             const obj = result.Buckets[i];
             obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise();
-            obj.Tags = s3.getBucketTagging({ Bucket: obj.Name }).promise();
-            data.items.push(obj);
 
-            promises.push(obj.Encryption);
-            promises.push(obj.Tags);
+            s3.getBucketTagging({ Bucket: obj.Name }).promise()
+                .then((value) => obj.Tags = value.TagSet)
+                .catch(() => obj.Tags = []);
+
+            data.items.push(obj);
         }
     } while (params.NextToken);
 
-    await Promise.allSettled(promises);
-    data.items.forEach((b) => b.Encryption.then(
-        (r) => {
-            b.Encryption = r;
-        },
-        (e) => {
-            b.Encryption = e.code;
-        },
-    ));
-
-    data.items.forEach((b) => b.Tags.then(
-        (r) => {
-            b.Tags = r.TagSet;
-        },
-        (e) => {
-            b.Tags = e.code;
-        },
-    ));
+    for (let i = 0; i < data.items.length; i += 1) {
+        const obj = data.items[i];
+        const encryption = await obj.Encryption;
+        if (encryption.ServerSideEncryptionConfiguration) {
+            obj.Encryption = encryption.ServerSideEncryptionConfiguration;
+        } else {
+            obj.Encryption = [];
+        }
+    }
 
     const result = await mapper.map(data);
     return result;

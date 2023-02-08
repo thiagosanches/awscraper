@@ -31,6 +31,7 @@ module.exports = {
         ],
         'no-continue': 'off',
         'max-len': 'off',
+        'no-return-assign': 'off',
     },
     globals: {
         describe: false,
