@@ -23,6 +23,8 @@ Right now, we are saving the data into a SQLite database and managing it through
 - RDS
 - Route 53 (ResourceRecords)
 - S3 + additional information about Encryption
+- SQS
+- SNS
 
 ## Overview
 There are 3 main components in the application:
