@@ -61,7 +61,7 @@ TYPE="cloudfront"
 DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" $QUERY | sqlite3 $SQLITEFILE | 
 jq --arg datelimit "$DATELIMIT" ' 
-    [._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
+    [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
     grep -v "arn:aws:wafv2" | \
     sort -u | \
     column -t -s','
