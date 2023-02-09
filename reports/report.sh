@@ -75,3 +75,13 @@ jq --arg datelimit "$DATELIMIT" '
     grep "0.0.0.0/0" | \
     sort -u | \
     column -t -s','
+
+message "AWS EC2 instances"
+TYPE="ec2"
+DATELIMIT=$(date -d -90days +%Y-%m-%d)
+sed "s/@type/$TYPE/g" $QUERY | sqlite3 $SQLITEFILE | 
+jq --arg datelimit "$DATELIMIT" ' 
+    [._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
+    sort -u | \
+    column -t -s','
+
