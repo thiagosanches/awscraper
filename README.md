@@ -5,12 +5,20 @@ We can also add some custom data for any resource to make it easy to search them
 
 There will be a cron job that should run this periodically to continuing fetching the data.
 
-We also need to keep in mind to avoid throttling from AWS when doing API calls.
-
 We are also planning to add a logic that will create a relationship between the cloud resource and the source-code (nodejs, java, c#, no matter), when that exists.
 
 Right now, we are saving the data into a SQLite database and managing it through [SQLiteStudio](https://www.sqlitestudio.pl/).
 
+## How can this tool help me on a daily basis?
+Right now, we don't have a front-end application yet, but you can run some reports that we are creating using bash. It's a plain text report, but it can help you to ask some question regarding the data that were collected, for example:
+- Which security groups were configured with the port 22 (SSH) opened for everyone?
+- ![image](https://user-images.githubusercontent.com/5191469/217949519-e6b2e190-83bb-4b4d-97c5-b5c8bdfc3b1a.png)
+
+After the awscraper execution, run the report:
+```bash
+cd reports/
+./report.sh <path to the sqlite database file>
+```
 ## What are the supported resources now?
 - CloudFront
 - DynamoDB
