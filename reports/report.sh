@@ -16,9 +16,9 @@ function help() {
 }
 
 function message() {
-    echo -e "${GREEN}=============================================${NOCOLOR}"
+    echo -e "${GREEN}==========================================================================================${NOCOLOR}"
     echo -e "${GREEN}$1.${NOCOLOR}"
-    echo -e "${GREEN}=============================================${NOCOLOR}"
+    echo -e "${GREEN}==========================================================================================${NOCOLOR}"
 }
 
 if [[ $# -ne 1 ]]
@@ -63,5 +63,15 @@ sed "s/@type/$TYPE/g" $QUERY | sqlite3 $SQLITEFILE |
 jq --arg datelimit "$DATELIMIT" ' 
     [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
     grep -v "arn:aws:wafv2" | \
+    sort -u | \
+    column -t -s','
+
+message "AWS SecurityGroups allowing 22 (SSH) to the world (0.0.0.0/0)"
+TYPE="sg"
+DATELIMIT=$(date -d -90days +%Y-%m-%d)
+sed "s/@type/$TYPE/g" $QUERY | sqlite3 $SQLITEFILE | 
+jq --arg datelimit "$DATELIMIT" ' 
+    [._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermissions[] | select(.FromPort == 22) | .FromPort, .IpRanges[].CidrIp) | tostring] | @csv' --raw-output | \
+    grep "0.0.0.0/0" | \
     sort -u | \
     column -t -s','
