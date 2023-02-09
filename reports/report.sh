@@ -2,7 +2,7 @@
 
 ##report.sh
 ##Information: This is a little helper in order to fetch some resources that 
-##are not complaint with the rules that you defined!
+##are not compliance with the rules that you defined!
 ##USAGE: ./report.sh <path to sqlite database>
 
 HELP_TOKEN="##"
