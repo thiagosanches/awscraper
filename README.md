@@ -11,8 +11,9 @@ Right now, we are saving the data into a SQLite database and managing it through
 
 ## How can this tool help me on a daily basis?
 Right now, we don't have a front-end application yet, but you can run some reports that we are creating using bash. It's a plain text report, but it can help you to ask some question regarding the data that were collected, for example:
-- Which security groups were configured with the port 22 (SSH) opened for everyone?
-- ![image](https://user-images.githubusercontent.com/5191469/217949519-e6b2e190-83bb-4b4d-97c5-b5c8bdfc3b1a.png)
+
+Which security groups were configured with the port 22 (SSH) opened for everyone?
+![image](https://user-images.githubusercontent.com/5191469/217949519-e6b2e190-83bb-4b4d-97c5-b5c8bdfc3b1a.png)
 
 After the awscraper execution, run the report:
 ```bash
