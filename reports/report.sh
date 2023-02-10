@@ -26,9 +26,9 @@ then
 	help; exit 1
 fi
 
-message "AWS AccessKeys that are under the date limit"
-TYPE="iam-users"
 DATELIMIT=$(date -d -90days +%Y-%m-%d)
+message "AWS AccessKeys that are under the date limit ($DATELIMIT)"
+TYPE="iam-users"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
 jq --arg datelimit "$DATELIMIT" '
     [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj.AccessKeys[] | select(.CreateDate < $datelimit and .Status == "Active") | .UserName, .AccessKeyId, .CreateDate, .Status) | tostring] | @csv' --raw-output | \
@@ -73,4 +73,12 @@ TYPE="ec2"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
 jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
     sort -u | \
+    column -t -s','
+
+message "AWS ElasticBeanstalk that are not GREEN"
+TYPE="elastic-beanstalk"
+sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
+jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .EnvironmentName, .SolutionStackName, .Health) | tostring] | @csv' --raw-output | \
+    sort -u | \
+    grep -v "Green" | \
     column -t -s','
