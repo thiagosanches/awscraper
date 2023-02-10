@@ -22,7 +22,7 @@ const awsOrganization = require('./utils/awsOrganization');
 const awsCredentials = require('./utils/awsCredentials');
 const awsRegions = require('./utils/awsRegions');
 
-const ACCOUNT_DENY_LIST_PARAMETER_INDEX = 2;
+const ACCOUNT_IGNORE_LIST_PARAMETER_INDEX = 2;
 
 try {
     (async () => {
@@ -31,8 +31,8 @@ try {
 
         // Use it to bypass the scraper on the ignored account.
         let accountIgnoreList = [];
-        if (process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX]) {
-            accountIgnoreList = process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX].split(',');
+        if (process.argv[ACCOUNT_IGNORE_LIST_PARAMETER_INDEX]) {
+            accountIgnoreList = process.argv[ACCOUNT_IGNORE_LIST_PARAMETER_INDEX].split(',');
             console.log('Ignoring the following accounts:', accountIgnoreList);
         }
 
