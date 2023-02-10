@@ -34,6 +34,9 @@ then
 	help; exit 1
 fi
 
+# Checks for sqlite3 installed on the system.
+which sqlite3 > /dev/null || echo "You have to install sqlite3!"
+
 DATELIMIT=$(date -d -90days +%Y-%m-%d)
 message "AWS AccessKeys that are under the date limit ($DATELIMIT)"
 TYPE="iam-users"
