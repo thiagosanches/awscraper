@@ -29,7 +29,7 @@ try {
         const accounts = [];
         const promises = [];
 
-        // Use it to bypass the scraper on the denied account.
+        // Use it to bypass the scraper on the ignored account.
         let accountIgnoreList = [];
         if (process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX]) {
             accountIgnoreList = process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX].split(',');
