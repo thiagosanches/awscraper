@@ -7,6 +7,7 @@ module.exports.map = async function (data) {
     baseObject.ResourceRegion = 'N/A';
     return {
         type: data.type,
+        ...baseObject,
         items: _.map(data.items, (m) => ({
             Id: m.Arn,
             RawObj: JSON.stringify(m),
