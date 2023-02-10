@@ -55,19 +55,19 @@ module.exports.ingest = async function (data) {
     const d = new Date();
     const formattedDate = (`0${d.getDate()}`).slice(-2) + (`0${d.getMonth() + 1}`).slice(-2) + d.getFullYear() + (`0${d.getHours()}`).slice(-2) + (`0${d.getMinutes()}`).slice(-2);
     const temporaryTable = `${data.type.replace('-', '')}_${formattedDate}`;
-    const createTemporaryTable = `CREATE TABLE "${temporaryTable}" ("Id" TEXT NOT NULL);`;
+    const createTemporaryTable = `CREATE TABLE "${temporaryTable}" ("Id" TEXT NOT NULL, "AccountId" TEXT NOT NULL, "Region" TEXT NOT NULL);`;
     db.exec(createTemporaryTable);
 
     for (let i = 0; i < data.items.length; i += 1) {
         const obj = data.items[i];
-        db.exec(`INSERT INTO "${temporaryTable}" VALUES ('${obj.Id}');`);
+        db.exec(`INSERT INTO "${temporaryTable}" VALUES ('${obj.Id}', '${data.AccountId}', '${data.ResourceRegion}');`);
     }
 
     const updateDeletedItemsSql = `
         UPDATE "resources" 
         SET "Status" = 'DELETED', 
         "LastModified" = CURRENT_TIMESTAMP 
-        WHERE "Id" NOT IN (SELECT Id FROM "${temporaryTable}") 
+        WHERE "Id" NOT IN (SELECT Id FROM "${temporaryTable}" WHERE "AccountId" = '${data.AccountId}' AND "Region" = '${data.ResourceRegion}') 
         AND "Type" = '${data.type}' AND "AccountId" = '${data.AccountId}'
         AND "Region" = '${data.ResourceRegion}'
         AND "Status" = 'LIVE';`;
