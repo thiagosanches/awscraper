@@ -68,7 +68,9 @@ module.exports.ingest = async function (data) {
         SET "Status" = 'DELETED', 
         "LastModified" = CURRENT_TIMESTAMP 
         WHERE "Id" NOT IN (SELECT Id FROM "${temporaryTable}") 
-        AND "Type" = '${data.type}' AND "AccountId" = '${data.AccountId}';`;
+        AND "Type" = '${data.type}' AND "AccountId" = '${data.AccountId}'
+        AND "Region" = '${data.ResourceRegion}'"
+        AND "Status" = 'LIVE';`;
     db.exec(updateDeletedItemsSql);
 
     // remove the temp table.
