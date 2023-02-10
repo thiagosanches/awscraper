@@ -42,9 +42,12 @@ There are 3 main components in the application:
 - **Scrapers**: It's responsible to fetch all the data that you want (that you think it's important for you). It's important to remember to perform the operations in a paginated way if necessary.
 - **Mappers**: It's responsible to transform the AWS object into a more customizable object that fits into the database.
 
-![image](https://user-images.githubusercontent.com/5191469/215287058-017f344f-7dd1-45f3-b5b8-778b93769e04.png)
-
-
+```mermaid
+graph LR
+    A[Scraper] -->|AWS Data| B(Mapper)
+    B --> |Transformed Data| C(Ingestor)
+    C --> D(Database)
+```
 
 ## Model (More info about ingestors)
 To save the returned data from scrapers we defined a simple table:
@@ -69,13 +72,6 @@ No matter the resources, we are planning to store the **mandatory** fields:
 - Type: a value defined programatically: `ec2`, `cloudfront` according to the original resource.
 - Status: `LIVE` or `DELETED`.
 - RawObject: a json object that could represent the whole AWS object or any object that you have built.
-
-```mermaid
-graph LR
-    A[Scraper] -->|AWS Data| B(Mapper)
-    B --> |Transformed Data| C(Ingestor)
-    C --> D(Database)
-```
 
 We can also rely on the built-in `json_extract()` function from SQLite, in order to extract the JSON data from the RawObj, if we want to return more details that are not part of the **mandatory** fields. For example, to return cloudfront distributions that doesn't have WebACLId:
 
