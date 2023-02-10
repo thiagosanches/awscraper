@@ -70,7 +70,12 @@ No matter the resources, we are planning to store the **mandatory** fields:
 - Status: `LIVE` or `DELETED`.
 - RawObject: a json object that could represent the whole AWS object or any object that you have built.
 
-![image](https://user-images.githubusercontent.com/5191469/215285305-027433f3-7403-43d8-9104-e88669507dc0.png)
+```mermaid
+graph LR
+    A[Scraper] -->|AWS Data| B(Mapper)
+    B --> |Transformed Data| C(Ingestor)
+    C --> D(Database)
+```
 
 We can also rely on the built-in `json_extract()` function from SQLite, in order to extract the JSON data from the RawObj, if we want to return more details that are not part of the **mandatory** fields. For example, to return cloudfront distributions that doesn't have WebACLId:
 
