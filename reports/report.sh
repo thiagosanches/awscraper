@@ -38,50 +38,39 @@ jq --arg datelimit "$DATELIMIT" '
 
 message "AWS EBS Volumes that are not encrypted"
 TYPE="ebs"
-DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq --arg datelimit "$DATELIMIT" ' 
-    [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | select(.Encrypted == false) | .Encrypted, .VolumeId) | tostring] | @csv' --raw-output | \
+jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | select(.Encrypted == false) | .Encrypted, .VolumeId) | tostring] | @csv' --raw-output | \
     grep "false" | \
     sort -u | \
     column -t -s','
 
 message "AWS S3 buckets without encryption"
 TYPE="s3"
-DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq --arg datelimit "$DATELIMIT" ' 
-    [._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .Encryption) | tostring] | @csv' --raw-output | \
+jq '[._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .Encryption) | tostring] | @csv' --raw-output | \
     grep -v "ApplyServerSideEncryptionByDefault" | \
     sort -u | \
     column -t -s','
 
 message "AWS CloudFront without any WAF (WebACLId)"
 TYPE="cloudfront"
-DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq --arg datelimit "$DATELIMIT" ' 
-    [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
+jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
     grep -v "arn:aws:wafv2" | \
     sort -u | \
     column -t -s','
 
 message "AWS SecurityGroups allowing 22 (SSH) to the world (0.0.0.0/0)"
 TYPE="sg"
-DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq --arg datelimit "$DATELIMIT" ' 
-    [._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermissions[] | select(.FromPort == 22) | .FromPort, .IpRanges[].CidrIp) | tostring] | @csv' --raw-output | \
+jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermissions[] | select(.FromPort == 22) | .FromPort, .IpRanges[].CidrIp) | tostring] | @csv' --raw-output | \
     grep "0.0.0.0/0" | \
     sort -u | \
     column -t -s','
 
 message "AWS EC2 instances"
 TYPE="ec2"
-DATELIMIT=$(date -d -90days +%Y-%m-%d)
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq --arg datelimit "$DATELIMIT" ' 
-    [._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
+jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
     sort -u | \
     column -t -s','
-
