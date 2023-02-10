@@ -31,7 +31,7 @@ message "AWS AccessKeys that are under the date limit ($DATELIMIT)"
 TYPE="iam-users"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
 jq --arg datelimit "$DATELIMIT" '
-    [._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj.AccessKeys[] | select(.CreateDate < $datelimit and .Status == "Active") | .UserName, .AccessKeyId, .CreateDate, .Status) | tostring] | @csv' --raw-output | \
+    [._Type, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj.AccessKeys[] | select(.CreateDate < $datelimit and .Status == "Active") | .UserName, .AccessKeyId, .CreateDate, .Status) | tostring] | @csv' --raw-output | \
     grep "Active" | \
     sort -u | \
     column -t -s','
@@ -39,7 +39,7 @@ jq --arg datelimit "$DATELIMIT" '
 message "AWS EBS Volumes that are not encrypted"
 TYPE="ebs"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | select(.Encrypted == false) | .Encrypted, .VolumeId) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | select(.Encrypted == false) | .Encrypted, .VolumeId) | tostring] | @csv' --raw-output | \
     grep "false" | \
     sort -u | \
     column -t -s','
@@ -47,7 +47,7 @@ jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | select(.Encrypt
 message "AWS S3 buckets without encryption"
 TYPE="s3"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .Encryption) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .Encryption) | tostring] | @csv' --raw-output | \
     grep -v "ApplyServerSideEncryptionByDefault" | \
     sort -u | \
     column -t -s','
@@ -55,7 +55,7 @@ jq '[._Id, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .Encrypti
 message "AWS CloudFront without any WAF (WebACLId)"
 TYPE="cloudfront"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
     grep -v "arn:aws:wafv2" | \
     sort -u | \
     column -t -s','
@@ -63,7 +63,7 @@ jq '[._AccountName, ._AccountId, ._Team, ._Comments, (._RawObj | .DomainName, .W
 message "AWS SecurityGroups allowing 22 (SSH) to the world (0.0.0.0/0)"
 TYPE="sg"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermissions[] | select(.FromPort == 22) | .FromPort, .IpRanges[].CidrIp) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermissions[] | select(.FromPort == 22) | .FromPort, .IpRanges[].CidrIp) | tostring] | @csv' --raw-output | \
     grep "0.0.0.0/0" | \
     sort -u | \
     column -t -s','
@@ -71,14 +71,14 @@ jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .IpPermis
 message "AWS EC2 instances"
 TYPE="ec2"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .Tags[] | select(.Key == "Name") | .Value) | tostring] | @csv' --raw-output | \
     sort -u | \
     column -t -s','
 
 message "AWS ElasticBeanstalk that are not GREEN"
 TYPE="elastic-beanstalk"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .EnvironmentName, .SolutionStackName, .Health) | tostring] | @csv' --raw-output | \
+jq '[._Type, ._AccountName, ._Id, ._AccountId, ._Team, ._Comments, (._RawObj | .EnvironmentName, .SolutionStackName, .Health) | tostring] | @csv' --raw-output | \
     sort -u | \
     grep -v "Green" | \
     column -t -s','
