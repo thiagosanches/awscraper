@@ -21,6 +21,13 @@ function message() {
     echo -e "${GREEN}==========================================================================================${NOCOLOR}"
 }
 
+# Just to avoid repeating the same commands accross the other reports.
+function format_report_data() {
+    cat | sort -u | \
+    sed 's/"null"/""/g' | \
+    column -t -s','
+}
+
 if [[ $# -ne 1 ]]
 then
 	help; exit 1
@@ -33,9 +40,7 @@ sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" |
 jq --arg datelimit "$DATELIMIT" '
     [._AccountName, ._AccountId, ._Type, ._Team, ._Comments, (._RawObj.AccessKeys[] | select(.CreateDate < $datelimit and .Status == "Active") | .UserName, .AccessKeyId, .CreateDate, .Status) | tostring] | @csv' --raw-output | \
     grep "Active" | \
-    sort -u | \
-    sed 's/"null"/""/g' | \
-    column -t -s','
+    format_report_data
 
 message "AWS EBS Volumes that are not encrypted"
 TYPE="ebs"
