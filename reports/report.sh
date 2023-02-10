@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 ##report.sh
 ##Information: This is a little helper in order to fetch some resources that 
