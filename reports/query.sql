@@ -1,5 +1,6 @@
 SELECT json_object(
     "_Id", Id, 
+    "_Type", Type,
     "_AccountName", AccountName, 
     "_AccountId", AccountId, 
     "_Team", Team, 
