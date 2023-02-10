@@ -22,10 +22,19 @@ const awsOrganization = require('./utils/awsOrganization');
 const awsCredentials = require('./utils/awsCredentials');
 const awsRegions = require('./utils/awsRegions');
 
+const ACCOUNT_DENY_LIST_PARAMETER_INDEX = 2;
+
 try {
     (async () => {
         const accounts = [];
         const promises = [];
+
+        // Use it to bypass the scraper on the denied account.
+        let accountIgnoreList = [];
+        if (process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX]) {
+            accountIgnoreList = process.argv[ACCOUNT_DENY_LIST_PARAMETER_INDEX].split(',');
+            console.log('Ignoring the following accounts:', accountIgnoreList);
+        }
 
         // Someone wants to scrape just one account instead of an entire organization.
         if (process.env.AWSCRAPER_ACCOUNT_ID) {
@@ -40,6 +49,8 @@ try {
         for (let i = 0; i < accounts.length; i += 1) {
             console.log(`👷 Working on account ${i + 1}/${accounts.length}!`);
             const account = accounts[i];
+
+            if (accountIgnoreList.indexOf(account.Id) >= 0) continue;
 
             const credentialsParams = await awsCredentials.getTemporaryAWSCredentialsForAccount(account.Id);
             const regions = await awsRegions.getEnabledRegions(account, credentialsParams);
