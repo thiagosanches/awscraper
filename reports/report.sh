@@ -90,3 +90,10 @@ sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" |
 jq '[._AccountName, ._AccountId, ._Type, ._Id, ._Team, ._Comments, (._RawObj | .EnvironmentName, .SolutionStackName, .Health) | tostring] | @csv' --raw-output | \
     grep -v "Green" | \
     format_report_data
+
+message "AWS RDS"
+TYPE="rds"
+sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
+jq '[._AccountName, ._AccountId, ._Type, ._Id, ._Team, ._Comments, (._RawObj | .Engine) | tostring] | @csv' --raw-output | \
+    grep -v "Green" | \
+    format_report_data
