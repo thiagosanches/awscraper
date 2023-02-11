@@ -115,7 +115,7 @@ Please, consider the existing codes ([ec2.js](./scrapers/ec2.js) or [cloudfront.
 ### Finally, execute the application
 Run `node index.js`.
 
-If you want to avoid scrapping an account, you can pass the accountId
+If you want to avoid scrapping an account, you can pass the accountId as parameter:
 ```
 node index.js 000000000001,000000000002
 ```
