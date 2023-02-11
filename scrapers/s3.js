@@ -16,7 +16,10 @@ module.exports.scrape = async function (account, credentialsParams) {
 
         for (let i = 0; i < result.Buckets.length; i += 1) {
             const obj = result.Buckets[i];
-            obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise();
+
+            obj.Encryption = s3.getBucketEncryption({ Bucket: obj.Name }).promise()
+                .then((value) => obj.Encryption = value.ServerSideEncryptionConfiguration)
+                .catch(() => obj.Encryption = "ServerSideEncryptionConfigurationNotFoundError");
 
             s3.getBucketTagging({ Bucket: obj.Name }).promise()
                 .then((value) => obj.Tags = value.TagSet)
