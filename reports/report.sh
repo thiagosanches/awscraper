@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-##report.sh
-##Information: This is a little helper in order to fetch some resources that 
-##are not compliance with the rules that you defined!
-##USAGE: ./report.sh <path to sqlite database>
+## report.sh
+## Information: This is a little helper in order to fetch some resources that 
+## are not compliance with the rules that you defined!
+## USAGE: ./report.sh <path to sqlite database>
 
-HELP_TOKEN="##"
+HELP_TOKEN="## "
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 QUERY='query.sql'
