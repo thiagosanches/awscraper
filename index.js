@@ -79,7 +79,7 @@ try {
         }
         const result = await Promise.all(promises);
         result.forEach((i) => {
-            if (i.items && i.items.length > 0) sqlite.ingest(i);
+            if (i.items) sqlite.ingest(i);
         });
     })();
 } catch (e) {
