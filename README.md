@@ -9,7 +9,7 @@ We are also planning to add a logic that will create a relationship between the 
 
 Right now, we are saving the data into a SQLite database and managing it through [SQLiteStudio](https://www.sqlitestudio.pl/).
 
-## How can this tool help me on a daily basis?
+## How this tool can help me on a daily basis?
 Right now, we don't have a front-end application yet, but you can run some reports that we are creating using bash. It's a plain text report, but it can help you to ask some question regarding the data that were collected, for example:
 
 Which security groups were configured with the port 22 (SSH) opened for everyone?
