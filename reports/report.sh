@@ -67,7 +67,7 @@ jq '[._AccountName, ._AccountId, ._Type, ._Id, ._Team, ._Comments, (._RawObj | .
 message "AWS CloudFront without any WAF (WebACLId)"
 TYPE="cloudfront"
 sed "s/@type/$TYPE/g" "$QUERY" | sqlite3 "$SQLITEFILE" | 
-jq '[._AccountName, ._AccountId, ._Type, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
+jq '[._AccountName, ._AccountId, ._Type, ._Team, ._Comments, (._RawObj | .DomainName, .WebACLId, .Enabled, .Aliases.Items[]) | tostring] | @csv' --raw-output | \
     grep -v "arn:aws:wafv2" | \
     format_report_data
 
