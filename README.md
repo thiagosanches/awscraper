@@ -35,6 +35,7 @@ cd reports/
 - SQS
 - SNS
 - API Gateway (REST APIs)
+- NAT Gateway
 
 ## Overview
 There are 3 main components in the application:
