@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1413.0",
+    "aws-sdk": "^2.1454.0",
     "sqlite3": "^5.1.6",
     "underscore": "^1.13.6"
   },
