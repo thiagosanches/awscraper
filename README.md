@@ -36,6 +36,7 @@ cd reports/
 - SNS
 - API Gateway (REST APIs)
 - NAT Gateway
+- SSM Parameters and their raw values - ⚠️ Note that you should exercise caution, as the values are decrypted.
 
 ## Overview
 There are 3 main components in the application:
