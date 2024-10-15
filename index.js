@@ -20,6 +20,7 @@ const nat = require('./scrapers/nat');
 const ssm = require('./scrapers/ssm');
 const autoscalinggroups = require('./scrapers/autoscalinggroups');
 const dms = require('./scrapers/dms');
+const glue = require('./scrapers/glue');
 
 /* utils */
 const awsOrganization = require('./utils/awsOrganization');
@@ -76,8 +77,8 @@ try {
                 promises.push(nat.scrape(account, credentialsParams));
                 promises.push(ssm.scrape(account, credentialsParams));
                 promises.push(autoscalinggroups.scrape(account, credentialsParams));
-
                 promises.push(dms.scrape(account, credentialsParams));
+                promises.push(glue.scrape(account, credentialsParams));
             }
 
             // Scrapers that doesn't need regions.
