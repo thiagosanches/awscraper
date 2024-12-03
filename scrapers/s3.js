@@ -25,6 +25,10 @@ module.exports.scrape = async function (account, credentialsParams) {
                 .then((value) => obj.Tags = value.TagSet)
                 .catch(() => obj.Tags = []);
 
+            const inteligentTieringConfigurations = await s3.listBucketIntelligentTieringConfigurations({
+                Bucket: obj.Name,
+            }).promise();
+            obj.InteligentTieringConfigurations = inteligentTieringConfigurations;
             data.items.push(obj);
         }
     } while (params.NextToken);
