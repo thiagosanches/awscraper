@@ -13,10 +13,27 @@ module.exports.scrape = async function (account, credentialsParams) {
 
     do {
         const result = await glue.getJobs(params).promise();
-        params.NextToken = result.NextToken;
-        if (result.Jobs) {
-            result.Jobs.forEach((i) => data.items.push(i));
+        for (const job of result.Jobs) {
+
+            const jobRuns = await glue.getJobRuns({ JobName: job.Name, MaxResults: 2 }).promise();
+
+            job.Executions = [];
+            if (jobRuns.JobRuns &&
+                jobRuns.JobRuns.length > 0) {
+                jobRuns.JobRuns[0].HoursExecutionTime = jobRuns.JobRuns[0].ExecutionTime / 3600;
+                jobRuns.JobRuns[0].MinutesExecutionTime = jobRuns.JobRuns[0].ExecutionTime / 60;
+                if (jobRuns.JobRuns[1]) { // TODO: REFACTOR THIS
+                    jobRuns.JobRuns[1].HoursExecutionTime = jobRuns.JobRuns[1].ExecutionTime / 3600;
+                    jobRuns.JobRuns[1].MinutesExecutionTime = jobRuns.JobRuns[1].ExecutionTime / 60;
+                }
+                job.Executions.push(...jobRuns.JobRuns);
+            }
+            data.items.push(job);
+
+            console.log(job)
         }
+        params.NextToken = result.NextToken;
+
     } while (params.NextToken);
 
     const result = await mapper.map(data);
