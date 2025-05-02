@@ -1,7 +1,4 @@
-const AWS = require('aws-sdk');
-const mapper = require('../mappers/glue');
-
-module.exports.scrape = async function (account, credentialsParams) {
+const AWS = require('aws-sdk'); const mapper = require('../mappers/glue'); module.exports.scrape = async function (account, credentialsParams) {
     console.log('⚙️  Scrapping Glue data!');
 
     const glue = new AWS.Glue({ apiVersion: '2017-03-31', region: account.Region, ...credentialsParams });
@@ -29,8 +26,6 @@ module.exports.scrape = async function (account, credentialsParams) {
                 job.Executions.push(...jobRuns.JobRuns);
             }
             data.items.push(job);
-
-            console.log(job)
         }
         params.NextToken = result.NextToken;
 
