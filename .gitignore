@@ -134,7 +134,11 @@ dist
 *.db-journal
 
 # shellcheck
+# Ignore shellcheck test files, but include our test directory for unit tests
+# (negate the generic 'test' ignore to allow the root/test folder)
 test
+!/test/
+!/test/**
 
 # some sql scripts
 work.sql
