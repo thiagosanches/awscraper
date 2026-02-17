@@ -260,7 +260,7 @@ app.get('/api/accounts', async (req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ error: 'Internal server error', message: err.message });
 });
