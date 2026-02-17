@@ -41,32 +41,26 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // Helper function to promisify database queries
-const dbAll = (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-        db.all(sql, params, (err, rows) => {
-            if (err) reject(err);
-            else resolve(rows);
-        });
+const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
     });
-};
+});
 
-const dbGet = (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-        db.get(sql, params, (err, row) => {
-            if (err) reject(err);
-            else resolve(row);
-        });
+const dbGet = (sql, params = []) => new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
     });
-};
+});
 
-const dbRun = (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-        db.run(sql, params, function(err) {
-            if (err) reject(err);
-            else resolve({ id: this.lastID, changes: this.changes });
-        });
+const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+        if (err) reject(err);
+        else resolve({ id: this.lastID, changes: this.changes });
     });
-};
+});
 
 // API Routes
 
@@ -78,8 +72,10 @@ app.get('/api/health', (req, res) => {
 // Get all resources with optional filters
 app.get('/api/resources', async (req, res) => {
     try {
-        const { type, region, status, accountId, team, search } = req.query;
-        
+        const {
+            type, region, status, accountId, team, search,
+        } = req.query;
+
         let sql = 'SELECT * FROM resources WHERE 1=1';
         const params = [];
 
@@ -128,7 +124,7 @@ app.get('/api/resources', async (req, res) => {
 app.get('/api/resources/:id', async (req, res) => {
     try {
         const resource = await dbGet('SELECT * FROM resources WHERE Id = ?', [req.params.id]);
-        
+
         if (!resource) {
             return res.status(404).json({ error: 'Resource not found' });
         }
@@ -160,7 +156,7 @@ app.put('/api/resources/:id', async (req, res) => {
                 LastModified = CURRENT_TIMESTAMP 
             WHERE Id = ?
         `;
-        
+
         await dbRun(sql, [Team || null, Comments || null, id]);
 
         // Return updated resource
@@ -181,25 +177,25 @@ app.get('/api/stats', async (req, res) => {
             typeCounts,
             regionCounts,
             teamCounts,
-            recentResources
+            recentResources,
         ] = await Promise.all([
             // Total resources
             dbGet('SELECT COUNT(*) as count FROM resources WHERE Status = "LIVE"'),
-            
+
             // Status breakdown
             dbAll('SELECT Status, COUNT(*) as count FROM resources GROUP BY Status'),
-            
+
             // Type breakdown
             dbAll('SELECT Type, COUNT(*) as count FROM resources WHERE Status = "LIVE" GROUP BY Type ORDER BY count DESC LIMIT 10'),
-            
+
             // Region breakdown
             dbAll('SELECT Region, COUNT(*) as count FROM resources WHERE Status = "LIVE" GROUP BY Region ORDER BY count DESC LIMIT 10'),
-            
+
             // Team breakdown
             dbAll('SELECT Team, COUNT(*) as count FROM resources WHERE Status = "LIVE" AND Team IS NOT NULL GROUP BY Team ORDER BY count DESC'),
-            
+
             // Recent activity
-            dbAll('SELECT * FROM resources ORDER BY LastModified DESC LIMIT 10')
+            dbAll('SELECT * FROM resources ORDER BY LastModified DESC LIMIT 10'),
         ]);
 
         res.json({
@@ -211,7 +207,7 @@ app.get('/api/stats', async (req, res) => {
             byType: typeCounts,
             byRegion: regionCounts,
             byTeam: teamCounts,
-            recent: recentResources
+            recent: recentResources,
         });
     } catch (error) {
         console.error('Error fetching stats:', error);
@@ -226,14 +222,14 @@ app.get('/api/filters', async (req, res) => {
             dbAll('SELECT DISTINCT Type FROM resources WHERE Status = "LIVE" ORDER BY Type'),
             dbAll('SELECT DISTINCT Region FROM resources WHERE Status = "LIVE" ORDER BY Region'),
             dbAll('SELECT DISTINCT Team FROM resources WHERE Team IS NOT NULL ORDER BY Team'),
-            dbAll('SELECT DISTINCT AccountId, AccountName FROM resources ORDER BY AccountName')
+            dbAll('SELECT DISTINCT AccountId, AccountName FROM resources ORDER BY AccountName'),
         ]);
 
         res.json({
-            types: types.map(r => r.Type),
-            regions: regions.map(r => r.Region),
-            teams: teams.map(r => r.Team),
-            accounts: accounts.map(r => ({ id: r.AccountId, name: r.AccountName }))
+            types: types.map((r) => r.Type),
+            regions: regions.map((r) => r.Region),
+            teams: teams.map((r) => r.Team),
+            accounts: accounts.map((r) => ({ id: r.AccountId, name: r.AccountName })),
         });
     } catch (error) {
         console.error('Error fetching filters:', error);

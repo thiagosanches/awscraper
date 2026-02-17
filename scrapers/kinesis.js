@@ -22,7 +22,6 @@ module.exports.scrape = async function (account, credentialsParams) {
             data.items.push(kinesisApp);
         }
         params.NextToken = result.NextToken;
-
     } while (params.NextToken);
 
     const result = await mapper.map(data);

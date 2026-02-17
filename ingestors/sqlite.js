@@ -3,18 +3,16 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database.db');
 
 // Helper to promisify db.run
-const dbRun = (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-        db.run(sql, params, function(err) {
-            if (err) reject(err);
-            else resolve({ lastID: this.lastID, changes: this.changes });
-        });
+const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+        if (err) reject(err);
+        else resolve({ lastID: this.lastID, changes: this.changes });
     });
-};
+});
 
 module.exports.ingest = async function (data) {
     console.log(`💿 Ingesting '${data.type}' ${data.items.length} item(s)!`);
-    
+
     // Create table using exec since it has no user input
     await new Promise((resolve, reject) => {
         db.exec(`CREATE TABLE IF NOT EXISTS "resources" (
@@ -40,7 +38,7 @@ module.exports.ingest = async function (data) {
         const insertSql = `
             INSERT INTO "resources" VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
         `;
-        
+
         try {
             await dbRun(insertSql, [
                 obj.Id,
@@ -51,13 +49,13 @@ module.exports.ingest = async function (data) {
                 obj.Status,
                 obj.Team || null,
                 obj.Comments || null,
-                obj.RawObj
+                obj.RawObj,
             ]);
         } catch (err) {
             // If it's SQLITE_CONSTRAINT error we already expect that!
             if (err.code === 'SQLITE_CONSTRAINT') {
                 // Update the existing object
-                const updateSql = `UPDATE "resources" SET "LastModified" = CURRENT_TIMESTAMP, "RawObj" = ? WHERE "Id" = ?`;
+                const updateSql = 'UPDATE "resources" SET "LastModified" = CURRENT_TIMESTAMP, "RawObj" = ? WHERE "Id" = ?';
                 await dbRun(updateSql, [obj.RawObj, obj.Id]);
             } else {
                 console.error('Insert error:', err);
@@ -71,7 +69,7 @@ module.exports.ingest = async function (data) {
     const d = new Date();
     const formattedDate = (`0${d.getDate()}`).slice(-2) + (`0${d.getMonth() + 1}`).slice(-2) + d.getFullYear() + (`0${d.getHours()}`).slice(-2) + (`0${d.getMinutes()}`).slice(-2);
     const temporaryTable = `temp_${data.type.replace(/-/g, '_')}_${formattedDate}`;
-    
+
     // Create temporary table (table name cannot be parameterized, but we control the value)
     const createTemporaryTable = `CREATE TABLE "${temporaryTable}" ("Id" TEXT NOT NULL, "AccountId" TEXT NOT NULL, "Region" TEXT NOT NULL);`;
     await new Promise((resolve, reject) => {

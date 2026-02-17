@@ -9,26 +9,26 @@ const resourceTypes = [
     'Lambda', 'EC2', 'S3', 'RDS', 'DynamoDB', 'API-Gateway',
     'SecurityGroup', 'CloudFront', 'SNS', 'SQS', 'EBS', 'NAT',
     'SSM', 'AutoScalingGroups', 'DMS', 'Glue', 'Kinesis',
-    'ElasticBeanstalk', 'Route53', 'IAMUsers'
+    'ElasticBeanstalk', 'Route53', 'IAMUsers',
 ];
 
 const regions = [
     'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2',
     'eu-west-1', 'eu-west-2', 'eu-central-1',
     'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1',
-    'sa-east-1', 'ca-central-1'
+    'sa-east-1', 'ca-central-1',
 ];
 
 const teams = [
     'Platform', 'Backend', 'Frontend', 'Data', 'DevOps',
-    'Security', 'Infrastructure', 'QA', 'Mobile', 'Analytics'
+    'Security', 'Infrastructure', 'QA', 'Mobile', 'Analytics',
 ];
 
 const accounts = [
     { id: '123456789012', name: 'Production' },
     { id: '234567890123', name: 'Development' },
     { id: '345678901234', name: 'Staging' },
-    { id: '456789012345', name: 'Testing' }
+    { id: '456789012345', name: 'Testing' },
 ];
 
 const statuses = ['LIVE', 'LIVE', 'LIVE', 'DELETED']; // 75% LIVE, 25% DELETED
@@ -43,7 +43,7 @@ const comments = [
     'Testing environment',
     null,
     null,
-    null
+    null,
 ];
 
 // Helper functions
@@ -53,28 +53,28 @@ function randomChoice(array) {
 
 function generateResourceId(type, index) {
     const prefixes = {
-        'Lambda': 'lambda-function',
-        'EC2': 'i',
-        'S3': 's3-bucket',
-        'RDS': 'rds-db',
-        'DynamoDB': 'dynamodb-table',
+        Lambda: 'lambda-function',
+        EC2: 'i',
+        S3: 's3-bucket',
+        RDS: 'rds-db',
+        DynamoDB: 'dynamodb-table',
         'API-Gateway': 'api-gateway',
-        'SecurityGroup': 'sg',
-        'CloudFront': 'cloudfront-dist',
-        'SNS': 'sns-topic',
-        'SQS': 'sqs-queue',
-        'EBS': 'vol',
-        'NAT': 'nat',
-        'SSM': 'ssm-param',
-        'AutoScalingGroups': 'asg',
-        'DMS': 'dms-task',
-        'Glue': 'glue-job',
-        'Kinesis': 'kinesis-stream',
-        'ElasticBeanstalk': 'eb-env',
-        'Route53': 'route53-zone',
-        'IAMUsers': 'iam-user'
+        SecurityGroup: 'sg',
+        CloudFront: 'cloudfront-dist',
+        SNS: 'sns-topic',
+        SQS: 'sqs-queue',
+        EBS: 'vol',
+        NAT: 'nat',
+        SSM: 'ssm-param',
+        AutoScalingGroups: 'asg',
+        DMS: 'dms-task',
+        Glue: 'glue-job',
+        Kinesis: 'kinesis-stream',
+        ElasticBeanstalk: 'eb-env',
+        Route53: 'route53-zone',
+        IAMUsers: 'iam-user',
     };
-    
+
     const prefix = prefixes[type] || 'resource';
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     return `${prefix}-${randomSuffix}`;
@@ -88,13 +88,13 @@ function generateRawObj(type, id, region) {
         Region: region,
         Tags: [
             { Key: 'Environment', Value: randomChoice(['prod', 'dev', 'staging']) },
-            { Key: 'ManagedBy', Value: 'terraform' }
+            { Key: 'ManagedBy', Value: 'terraform' },
         ],
         CreatedDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
         Metadata: {
             Description: `Mock ${type} resource`,
-            Version: '1.0'
-        }
+            Version: '1.0',
+        },
     });
 }
 
@@ -108,7 +108,7 @@ function getLastModified() {
 // Generate mock data
 function generateMockResources(count = 100) {
     const resources = [];
-    
+
     for (let i = 0; i < count; i++) {
         const type = randomChoice(resourceTypes);
         const region = randomChoice(regions);
@@ -117,7 +117,7 @@ function generateMockResources(count = 100) {
         const status = randomChoice(statuses);
         const team = Math.random() > 0.3 ? randomChoice(teams) : null;
         const comment = randomChoice(comments);
-        
+
         resources.push({
             Id: id,
             AccountId: account.id,
@@ -128,10 +128,10 @@ function generateMockResources(count = 100) {
             Team: team,
             Comments: comment,
             LastModified: getLastModified(),
-            RawObj: generateRawObj(type, id, region)
+            RawObj: generateRawObj(type, id, region),
         });
     }
-    
+
     return resources;
 }
 
@@ -156,7 +156,6 @@ function insertMockData(resources) {
                 if (err) {
                     console.error('Error creating table:', err);
                     reject(err);
-                    return;
                 }
             });
 
@@ -195,7 +194,7 @@ function insertMockData(resources) {
                         } else {
                             inserted++;
                         }
-                    }
+                    },
                 );
             });
 
@@ -216,27 +215,27 @@ function insertMockData(resources) {
 async function main() {
     const count = parseInt(process.argv[2]) || 150;
     console.log(`Generating ${count} mock AWS resources...`);
-    
+
     const resources = generateMockResources(count);
-    
+
     // Group by type for summary
     const summary = {};
-    resources.forEach(r => {
+    resources.forEach((r) => {
         summary[r.Type] = (summary[r.Type] || 0) + 1;
     });
-    
+
     console.log('\nResource distribution:');
     Object.entries(summary)
         .sort((a, b) => b[1] - a[1])
         .forEach(([type, count]) => {
             console.log(`  ${type}: ${count}`);
         });
-    
+
     try {
         await insertMockData(resources);
         console.log('\n✓ Mock data generation complete!');
         console.log(`Database location: ${dbPath}`);
-        
+
         // Close database
         db.close((err) => {
             if (err) {

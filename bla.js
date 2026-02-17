@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
+
 const db = new sqlite3.Database('blah.db');
-var fs = require('fs/promises');
+const fs = require('fs/promises');
 
 const sql = `
 WITH RECURSIVE ArtifactHierarchy AS (
@@ -22,14 +23,12 @@ SELECT DISTINCT *
  ORDER BY ParentId;
 `;
 
-const runQuery = (query, params) => {
-    return new Promise((resolve, reject) => {
-        db.all(query, params, (err, row) => {
-            if (err) reject(err);
-            else resolve(row);
-        });
+const runQuery = (query, params) => new Promise((resolve, reject) => {
+    db.all(query, params, (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
     });
-}
+});
 
 const convertRawDataToHierarchicalJSON = (rawData, parentId = null) => {
     const data = [];
@@ -39,11 +38,11 @@ const convertRawDataToHierarchicalJSON = (rawData, parentId = null) => {
             if (children.length) {
                 obj.children = children;
             }
-            data.push(obj)
+            data.push(obj);
         }
     }
     return data;
-}
+};
 
 try {
     (async () => {
@@ -51,14 +50,11 @@ try {
         const hierarchicalData = convertRawDataToHierarchicalJSON(rawData, null);
         const root = {};
         root.Id = 0;
-        root.Identifier = "ROOT";
+        root.Identifier = 'ROOT';
         root.children = hierarchicalData;
-        await fs.writeFile("bla.json", JSON.stringify(root));
-    })()
+        await fs.writeFile('bla.json', JSON.stringify(root));
+    })();
 } catch (e) {
     console.error(e.message);
     process.exit(1);
 }
-
-
-
