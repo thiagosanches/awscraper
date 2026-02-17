@@ -30,9 +30,9 @@ const db = new sqlite3.Database(dbPath, (err) => {
             "LastModified" TEXT NOT NULL,
             "RawObj" TEXT,
             PRIMARY KEY("Id")
-        )`, (err) => {
-            if (err) {
-                console.error('Error creating table:', err.message);
+        )`, (tableErr) => {
+            if (tableErr) {
+                console.error('Error creating table:', tableErr.message);
             } else {
                 console.log('Database schema initialized');
             }
@@ -257,12 +257,6 @@ app.get('/api/accounts', async (req, res) => {
         console.error('Error fetching accounts:', error);
         res.status(500).json({ error: 'Failed to fetch accounts', message: error.message });
     }
-});
-
-// Error handling middleware
-app.use((err, req, res) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
 // Graceful shutdown
