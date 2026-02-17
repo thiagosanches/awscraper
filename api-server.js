@@ -10,37 +10,11 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Database connection
+// Database connection and helpers
 const dbPath = path.join(__dirname, 'database.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to SQLite database at', dbPath);
-        // Initialize schema if needed
-        db.run(`CREATE TABLE IF NOT EXISTS "resources" (
-            "Id" TEXT NOT NULL,
-            "AccountId" TEXT NOT NULL,
-            "AccountName" TEXT NOT NULL,
-            "Region" TEXT NOT NULL,
-            "Type" TEXT,
-            "Status" TEXT NOT NULL,
-            "Team" TEXT,
-            "Comments" TEXT,
-            "LastModified" TEXT NOT NULL,
-            "RawObj" TEXT,
-            PRIMARY KEY("Id")
-        )`, (tableErr) => {
-            if (tableErr) {
-                console.error('Error creating table:', tableErr.message);
-            } else {
-                console.log('Database schema initialized');
-            }
-        });
-    }
-});
+let db;
 
-// Helper function to promisify database queries
+// Helper functions to promisify database queries
 const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
         if (err) reject(err);
@@ -61,6 +35,40 @@ const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
         else resolve({ id: this.lastID, changes: this.changes });
     });
 });
+
+// Initialize database
+async function initializeDatabase() {
+    return new Promise((resolve, reject) => {
+        db = new sqlite3.Database(dbPath, async (err) => {
+            if (err) {
+                console.error('Error opening database:', err.message);
+                reject(err);
+            } else {
+                console.log('Connected to SQLite database at', dbPath);
+                try {
+                    await dbRun(`CREATE TABLE IF NOT EXISTS "resources" (
+                        "Id" TEXT NOT NULL,
+                        "AccountId" TEXT NOT NULL,
+                        "AccountName" TEXT NOT NULL,
+                        "Region" TEXT NOT NULL,
+                        "Type" TEXT,
+                        "Status" TEXT NOT NULL,
+                        "Team" TEXT,
+                        "Comments" TEXT,
+                        "LastModified" TEXT NOT NULL,
+                        "RawObj" TEXT,
+                        PRIMARY KEY("Id")
+                    )`);
+                    console.log('Database schema initialized');
+                    resolve();
+                } catch (tableErr) {
+                    console.error('Error creating table:', tableErr.message);
+                    reject(tableErr);
+                }
+            }
+        });
+    });
+}
 
 // API Routes
 
@@ -262,19 +270,34 @@ app.get('/api/accounts', async (req, res) => {
 // Graceful shutdown
 process.on('SIGINT', () => {
     console.log('\nClosing database connection...');
-    db.close((err) => {
-        if (err) {
-            console.error('Error closing database:', err.message);
-        }
-        console.log('Database connection closed.');
+    if (db) {
+        db.close((err) => {
+            if (err) {
+                console.error('Error closing database:', err.message);
+            } else {
+                console.log('Database connection closed.');
+            }
+            process.exit(0);
+        });
+    } else {
         process.exit(0);
-    });
+    }
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 AWScraper API Server running on http://localhost:${PORT}`);
-    console.log(`   Health check: http://localhost:${PORT}/api/health`);
-    console.log(`   Resources: http://localhost:${PORT}/api/resources`);
-    console.log(`   Stats: http://localhost:${PORT}/api/stats`);
-});
+async function startServer() {
+    try {
+        await initializeDatabase();
+        app.listen(PORT, () => {
+            console.log(`🚀 AWScraper API Server running on http://localhost:${PORT}`);
+            console.log(`   Health check: http://localhost:${PORT}/api/health`);
+            console.log(`   Resources: http://localhost:${PORT}/api/resources`);
+            console.log(`   Stats: http://localhost:${PORT}/api/stats`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+startServer();
