@@ -124,3 +124,58 @@ node index.js 000000000001,000000000002
 ```
 
 You should see a `database.db` file being created.
+
+## Web UI
+A modern Vue 3 web interface is available to visualize and manage your AWS resources.
+
+### Setup
+1. Install UI dependencies:
+```bash
+cd awscraper-ui
+npm install
+```
+
+2. Configure the API endpoint (optional):
+```bash
+cp .env.example .env
+# Edit .env if your API server runs on a different port
+```
+
+### Running the Application
+
+#### Option 1: Development Mode
+Start both the API server and UI dev server:
+
+```bash
+# Terminal 1 - API Server (from project root)
+npm run api
+
+# Terminal 2 - UI Dev Server (from project root)
+cd awscraper-ui
+npm run dev
+```
+
+The API server runs on `http://localhost:3001` and the UI on `http://localhost:5173`.
+
+#### Option 2: Production Build
+Build and serve the UI:
+
+```bash
+cd awscraper-ui
+npm run build
+npm run preview
+```
+
+### UI Features
+- **Dashboard**: Real-time statistics and overview of your AWS resources
+- **Resource Inventory**: Browse, filter, and search all collected resources
+- **Metadata Management**: Add team and comments to resources for better organization
+- **Visualization**: Tree-based visualization of resource relationships
+- **Dark Mode**: Professional dark mode interface optimized for long sessions
+
+### UI Stack
+- Vue 3 with Composition API
+- Vite for fast development and building
+- D3.js for data visualization
+- Express.js API server with SQLite backend
+

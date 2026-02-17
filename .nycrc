@@ -1,0 +1,29 @@
+{
+  "all": true,
+  "include": [
+    "scrapers/**/*.js",
+    "mappers/**/*.js",
+    "ingestors/**/*.js",
+    "utils/**/*.js",
+    "common/**/*.js"
+  ],
+  "exclude": [
+    "test/**",
+    "coverage/**",
+    "node_modules/**",
+    "awscraper-ui/**",
+    "*.spec.js",
+    "generate-mock-data.js"
+  ],
+  "reporter": [
+    "text",
+    "text-summary",
+    "html",
+    "lcov"
+  ],
+  "check-coverage": false,
+  "lines": 80,
+  "statements": 80,
+  "functions": 80,
+  "branches": 80
+}

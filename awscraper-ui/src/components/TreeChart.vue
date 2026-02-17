@@ -255,18 +255,31 @@ export default {
   },
   methods: {
     drawChart() {
-      const treeLayout = d3.tree().size([350, 350])
+      // Get container dimensions
+      const container = this.$el
+      const width = container.clientWidth || 800
+      const height = 600
+      const margin = { top: 40, right: 120, bottom: 40, left: 120 }
+      
+      const treeLayout = d3.tree().size([height - margin.top - margin.bottom, width - margin.left - margin.right])
       const root = d3.hierarchy(this.myData)
       treeLayout(root)
 
       const svg = d3
-        .select('svg')
-        .attr('width', 500)
-        .attr('height', 500)
-        .append('g')
-        .attr('transform', 'translate(50,50)')
+        .select(this.$el.querySelector('svg'))
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet')
 
-      svg
+      // Clear any existing content
+      svg.selectAll('*').remove()
+      
+      const g = svg
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`)
+
+      g
         .selectAll('.link')
         .data(root.links())
         .enter()
@@ -280,13 +293,13 @@ export default {
             .y((d) => d.x)
         )
 
-      const nodes = svg
+      const nodes = g
         .selectAll('.node')
         .data(root.descendants())
         .enter()
         .append('g')
         .attr('class', 'node')
-        .attr('transform', (d) => 'translate(' + d.y + ',' + d.x + ')')
+        .attr('transform', (d) => `translate(${d.y},${d.x})`)
 
       nodes
         .append('circle')
@@ -313,33 +326,72 @@ export default {
 </script>
 
 <template>
-  <svg></svg>
+  <div class="tree-chart-wrapper">
+    <svg></svg>
+  </div>
 </template>
 
 <style>
+.tree-chart-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
 svg {
-  /* important for responsiveness */
   display: block;
-  fill: lightgray;
+  fill: transparent;
   stroke: none;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  max-width: 100%;
+  max-height: 600px;
 }
 
 .link {
   fill: none;
-  stroke: #757575;
+  stroke: rgba(255, 255, 255, 0.3);
   stroke-width: 2px;
+  transition: all 0.3s ease;
 }
 
-.node circle {
-  fill: #fff;
-  stroke: green;
+.link:hover {
+  stroke: #4ecdc4;
   stroke-width: 3px;
 }
 
+.node circle {
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: #4ecdc4;
+  stroke-width: 3px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  filter: drop-shadow(0 0 8px rgba(78, 205, 196, 0.6));
+}
+
+.node:hover circle {
+  fill: #4ecdc4;
+  stroke: #fff;
+  stroke-width: 4px;
+  r: 8;
+  filter: drop-shadow(0 0 15px rgba(78, 205, 196, 1));
+}
+
 .node text {
-  font: 12px sans-serif;
+  font: 13px 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  fill: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.node:hover text {
+  fill: #4ecdc4;
+  font-size: 14px;
+  font-weight: 700;
 }
 </style>
