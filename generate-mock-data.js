@@ -51,7 +51,7 @@ function randomChoice(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-function generateResourceId(type, index) {
+function generateResourceId(type) {
     const prefixes = {
         Lambda: 'lambda-function',
         EC2: 'i',
@@ -213,7 +213,7 @@ function insertMockData(resources) {
 
 // Main execution
 async function main() {
-    const count = parseInt(process.argv[2]) || 150;
+    const count = parseInt(process.argv[2], 10) || 150;
     console.log(`Generating ${count} mock AWS resources...`);
 
     const resources = generateMockResources(count);
@@ -227,8 +227,8 @@ async function main() {
     console.log('\nResource distribution:');
     Object.entries(summary)
         .sort((a, b) => b[1] - a[1])
-        .forEach(([type, count]) => {
-            console.log(`  ${type}: ${count}`);
+        .forEach(([type, total]) => {
+            console.log(`  ${type}: ${total}`);
         });
 
     try {

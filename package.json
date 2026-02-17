@@ -7,6 +7,7 @@
     "test": "mocha --recursive",
     "test:coverage": "nyc mocha --recursive",
     "test:coverage:report": "nyc report --reporter=html && echo 'Coverage report generated at coverage/index.html'",
+    "test:all": "npm run lint && npm run test:coverage",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "api": "node api-server.js",
