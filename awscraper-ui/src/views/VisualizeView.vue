@@ -1,5 +1,15 @@
 <script setup>
+import { ref } from 'vue'
 import TreeChart from '../components/TreeChart.vue'
+
+const chartRef = ref(null)
+const selectedLayout = ref('Hierarchical')
+const depth = ref(5)
+const stats = ref({ nodes: 0, maxDepth: 0, accounts: 0, types: 0 })
+
+const onStats = (s) => { stats.value = s }
+const resetView = () => chartRef.value?.resetView()
+const exportPNG = () => chartRef.value?.exportPNG()
 </script>
 
 <template>
@@ -13,24 +23,23 @@ import TreeChart from '../components/TreeChart.vue'
     <div class="controls-bar glass-card">
       <div class="control-group">
         <label class="control-label">Layout</label>
-        <select class="control-select">
+        <select v-model="selectedLayout" class="control-select">
           <option>Hierarchical</option>
           <option>Radial</option>
-          <option>Force-Directed</option>
         </select>
       </div>
       <div class="control-group">
-        <label class="control-label">Depth</label>
-        <input type="range" min="1" max="5" value="5" class="control-slider" />
+        <label class="control-label">Depth ({{ depth }})</label>
+        <input type="range" v-model.number="depth" min="1" max="5" class="control-slider" />
       </div>
-      <button class="control-btn">
+      <button class="control-btn" @click="resetView">
         <svg class="control-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Reset View
       </button>
-      <button class="control-btn">
+      <button class="control-btn" @click="exportPNG">
         <svg class="control-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -44,7 +53,7 @@ import TreeChart from '../components/TreeChart.vue'
     <div class="main-layout">
       <!-- Graph Container -->
       <div class="graph-container glass-card">
-        <TreeChart />
+        <TreeChart ref="chartRef" :layout="selectedLayout" :maxDepth="depth" @stats="onStats" />
       </div>
 
       <!-- Sidebar -->
@@ -54,20 +63,16 @@ import TreeChart from '../components/TreeChart.vue'
           <h3 class="panel-title">Legend</h3>
           <div class="legend-items">
             <div class="legend-item">
+              <span class="legend-color" style="background: #ffffff;"></span>
+              <span class="legend-label">Root</span>
+            </div>
+            <div class="legend-item">
               <span class="legend-color" style="background: #10b981;"></span>
-              <span class="legend-label">Projects</span>
+              <span class="legend-label">Accounts</span>
             </div>
             <div class="legend-item">
-              <span class="legend-color" style="background: #3b82f6;"></span>
-              <span class="legend-label">Lambda Functions</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #f59e0b;"></span>
-              <span class="legend-label">Data Services</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #8b5cf6;"></span>
-              <span class="legend-label">Storage</span>
+              <span class="legend-color" style="background: #4ecdc4;"></span>
+              <span class="legend-label">Resource Types</span>
             </div>
           </div>
         </div>
@@ -78,19 +83,19 @@ import TreeChart from '../components/TreeChart.vue'
           <div class="stats-list">
             <div class="stat-item">
               <span class="stat-label">Total Nodes</span>
-              <span class="stat-value">28</span>
+              <span class="stat-value">{{ stats.nodes }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Max Depth</span>
-              <span class="stat-value">4</span>
+              <span class="stat-value">{{ stats.maxDepth }}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Projects</span>
-              <span class="stat-value">5</span>
+              <span class="stat-label">Accounts</span>
+              <span class="stat-value">{{ stats.accounts }}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Resources</span>
-              <span class="stat-value">23</span>
+              <span class="stat-label">Resource Types</span>
+              <span class="stat-value">{{ stats.types }}</span>
             </div>
           </div>
         </div>

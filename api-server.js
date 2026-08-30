@@ -81,7 +81,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/resources', async (req, res) => {
     try {
         const {
-            type, region, status, accountId, team, search,
+            type, region, status, accountId, team, search, limit,
         } = req.query;
 
         let sql = 'SELECT * FROM resources WHERE 1=1';
@@ -120,6 +120,11 @@ app.get('/api/resources', async (req, res) => {
 
         sql += ' ORDER BY LastModified DESC';
 
+        if (limit) {
+            sql += ' LIMIT ?';
+            params.push(parseInt(limit, 10));
+        }
+
         const resources = await dbAll(sql, params);
         res.json(resources);
     } catch (error) {
@@ -144,35 +149,62 @@ app.get('/api/resources/:id', async (req, res) => {
     }
 });
 
-// Update resource metadata (Team and Comments only)
+// Update resource metadata
 app.put('/api/resources/:id', async (req, res) => {
     try {
-        const { Team, Comments } = req.body;
+        const {
+            Team, Comments, Status, AccountName,
+        } = req.body;
         const { id } = req.params;
 
-        // First check if resource exists
         const existing = await dbGet('SELECT Id FROM resources WHERE Id = ?', [id]);
         if (!existing) {
             return res.status(404).json({ error: 'Resource not found' });
         }
 
-        // Update only Team and Comments
         const sql = `
             UPDATE resources 
             SET Team = ?, 
                 Comments = ?,
+                Status = COALESCE(?, Status),
+                AccountName = COALESCE(?, AccountName),
                 LastModified = CURRENT_TIMESTAMP 
             WHERE Id = ?
         `;
 
-        await dbRun(sql, [Team || null, Comments || null, id]);
+        await dbRun(sql, [Team || null, Comments || null, Status || null, AccountName || null, id]);
 
-        // Return updated resource
         const updated = await dbGet('SELECT * FROM resources WHERE Id = ?', [id]);
         res.json(updated);
     } catch (error) {
         console.error('Error updating resource:', error);
         res.status(500).json({ error: 'Failed to update resource', message: error.message });
+    }
+});
+
+// Manually create a resource
+app.post('/api/resources', async (req, res) => {
+    try {
+        const {
+            Id, AccountId, AccountName, Region, Type, Status = 'LIVE', Team, Comments, RawObj,
+        } = req.body;
+
+        if (!Id || !AccountId || !AccountName || !Region || !Type) {
+            return res.status(400).json({ error: 'Missing required fields: Id, AccountId, AccountName, Region, Type' });
+        }
+
+        const sql = `INSERT INTO resources (Id, AccountId, AccountName, Region, Type, Status, Team, Comments, LastModified, RawObj)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)`;
+
+        await dbRun(sql, [Id, AccountId, AccountName, Region, Type, Status, Team || null, Comments || null, RawObj || '{}']);
+        const created = await dbGet('SELECT * FROM resources WHERE Id = ?', [Id]);
+        res.status(201).json(created);
+    } catch (err) {
+        if (err.code === 'SQLITE_CONSTRAINT') {
+            return res.status(409).json({ error: 'A resource with this ID already exists' });
+        }
+        console.error('Error creating resource:', err);
+        res.status(500).json({ error: 'Failed to create resource', message: err.message });
     }
 });
 
@@ -264,6 +296,32 @@ app.get('/api/accounts', async (req, res) => {
     } catch (error) {
         console.error('Error fetching accounts:', error);
         res.status(500).json({ error: 'Failed to fetch accounts', message: error.message });
+    }
+});
+
+// Get hierarchical tree: ROOT → Account → ResourceType
+app.get('/api/tree', async (req, res) => {
+    try {
+        const rows = await dbAll(
+            'SELECT AccountName, Type, COUNT(*) as count FROM resources WHERE Status = "LIVE" GROUP BY AccountName, Type ORDER BY AccountName, count DESC',
+        );
+
+        const accountMap = {};
+        rows.forEach((row) => {
+            if (!accountMap[row.AccountName]) {
+                accountMap[row.AccountName] = { Identifier: row.AccountName, children: [] };
+            }
+            accountMap[row.AccountName].children.push({
+                Identifier: `${row.Type} (${row.count})`,
+                type: row.Type,
+                count: row.count,
+            });
+        });
+
+        res.json({ Identifier: 'ROOT', children: Object.values(accountMap) });
+    } catch (error) {
+        console.error('Error building tree:', error);
+        res.status(500).json({ error: 'Failed to build tree', message: error.message });
     }
 });
 

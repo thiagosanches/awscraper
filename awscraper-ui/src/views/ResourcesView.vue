@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
@@ -9,6 +9,7 @@ const selectedRegion = ref('all')
 const selectedStatus = ref('all')
 const editingResource = ref(null)
 const showEditModal = ref(false)
+const modalMode = ref('edit') // 'edit' | 'create'
 const detailedResource = ref(null)
 const showDetailsModal = ref(false)
 const loading = ref(false)
@@ -69,10 +70,12 @@ onMounted(async () => {
   await fetchResources()
 })
 
-// Watch for filter changes
-watch([selectedType, selectedRegion, selectedStatus, searchQuery], () => {
-  fetchResources()
-}, { debounce: 300 })
+let searchDebounce = null
+watch([selectedType, selectedRegion, selectedStatus], () => { fetchResources() })
+watch(searchQuery, () => {
+  clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => fetchResources(), 300)
+})
 
 const getResourceIcon = (type) => {
   const icons = {
@@ -102,6 +105,13 @@ const getResourceIcon = (type) => {
 
 const openEditModal = (resource) => {
   editingResource.value = { ...resource }
+  modalMode.value = 'edit'
+  showEditModal.value = true
+}
+
+const openCreateModal = () => {
+  editingResource.value = { Id: '', AccountId: '', AccountName: '', Region: '', Type: '', Status: 'LIVE', Team: null, Comments: '', RawObj: '{}' }
+  modalMode.value = 'create'
   showEditModal.value = true
 }
 
@@ -124,7 +134,9 @@ const saveResource = async () => {
       },
       body: JSON.stringify({
         Team: editingResource.value.Team,
-        Comments: editingResource.value.Comments
+        Comments: editingResource.value.Comments,
+        Status: editingResource.value.Status,
+        AccountName: editingResource.value.AccountName,
       })
     })
 
@@ -147,6 +159,31 @@ const saveResource = async () => {
   }
 }
 
+const createResource = async () => {
+  if (!editingResource.value) return
+  loading.value = true
+  error.value = null
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingResource.value),
+    })
+    if (!response.ok) {
+      const body = await response.json()
+      throw new Error(body.error || `HTTP ${response.status}`)
+    }
+    const created = await response.json()
+    allResources.value.unshift(created)
+    closeEditModal()
+  } catch (err) {
+    console.error('Failed to create resource:', err)
+    error.value = `Failed to create resource: ${err.message}`
+  } finally {
+    loading.value = false
+  }
+}
+
 const openDetailsModal = (resource) => {
   detailedResource.value = resource
   showDetailsModal.value = true
@@ -155,6 +192,19 @@ const openDetailsModal = (resource) => {
 const closeDetailsModal = () => {
   detailedResource.value = null
   showDetailsModal.value = false
+}
+
+const exportCSV = () => {
+  const headers = ['Id', 'Type', 'Region', 'AccountName', 'AccountId', 'Status', 'Team', 'Comments', 'LastModified']
+  const escape = (v) => `"${(v ?? '').toString().replace(/"/g, '""')}"`
+  const rows = allResources.value.map(r => headers.map(h => escape(r[h])).join(','))
+  const csv = [headers.join(','), ...rows].join('\n')
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'aws-resources.csv'
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 const formatRawObj = (rawObj) => {
@@ -224,14 +274,23 @@ const formatRawObj = (rawObj) => {
     <!-- Results Count -->
     <div class="results-info">
       <span class="results-count">{{ allResources.length }} resources found</span>
-      <button class="export-btn">
+      <div class="results-actions">
+        <button class="create-btn" @click="openCreateModal">
+          <svg class="export-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          New Resource
+        </button>
+        <button class="export-btn" @click="exportCSV">
         <svg class="export-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Export
-      </button>
+        </button>
+      </div>
     </div>
 
     <!-- Resources Grid -->
@@ -265,7 +324,7 @@ const formatRawObj = (rawObj) => {
     <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Edit Resource Metadata</h2>
+          <h2 class="modal-title">{{ modalMode === 'create' ? 'New Resource' : 'Edit Resource' }}</h2>
           <button class="modal-close" @click="closeEditModal">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -280,33 +339,36 @@ const formatRawObj = (rawObj) => {
             <div class="form-row">
               <div class="form-group full-width">
                 <label class="form-label">Resource ID</label>
-                <input type="text" v-model="editingResource.Id" class="form-input" disabled />
+                <input type="text" v-model="editingResource.Id" class="form-input" :disabled="modalMode === 'edit'" :placeholder="modalMode === 'create' ? 'arn:aws:... or any unique identifier' : ''" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Type</label>
-                <input type="text" v-model="editingResource.Type" class="form-input" disabled />
+                <input type="text" v-model="editingResource.Type" class="form-input" :disabled="modalMode === 'edit'" placeholder="ec2, lambda, s3..." />
               </div>
               <div class="form-group">
                 <label class="form-label">Region</label>
-                <input type="text" v-model="editingResource.Region" class="form-input" disabled />
+                <input type="text" v-model="editingResource.Region" class="form-input" :disabled="modalMode === 'edit'" placeholder="us-east-1" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Account ID</label>
-                <input type="text" v-model="editingResource.AccountId" class="form-input" disabled />
+                <input type="text" v-model="editingResource.AccountId" class="form-input" :disabled="modalMode === 'edit'" />
               </div>
               <div class="form-group">
                 <label class="form-label">Account Name</label>
-                <input type="text" v-model="editingResource.AccountName" class="form-input" disabled />
+                <input type="text" v-model="editingResource.AccountName" class="form-input" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Status</label>
-                <input type="text" v-model="editingResource.Status" class="form-input" disabled />
+                <select v-model="editingResource.Status" class="form-select">
+                  <option value="LIVE">LIVE</option>
+                  <option value="DELETED">DELETED</option>
+                </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Last Modified</label>
@@ -337,11 +399,22 @@ const formatRawObj = (rawObj) => {
               </div>
             </div>
           </div>
+          <div v-if="modalMode === 'create'" class="form-section">
+            <h3 class="section-title">Raw Object</h3>
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label class="form-label">RawObj (JSON)</label>
+                <textarea v-model="editingResource.RawObj" class="form-textarea" rows="5" placeholder="{}"></textarea>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="modal-footer">
           <button class="btn-secondary" @click="closeEditModal">Cancel</button>
-          <button class="btn-primary" @click="saveResource">Save Changes</button>
+          <button class="btn-primary" @click="modalMode === 'create' ? createResource() : saveResource()">
+            {{ modalMode === 'create' ? 'Create Resource' : 'Save Changes' }}
+          </button>
         </div>
       </div>
     </div>
@@ -561,6 +634,31 @@ const formatRawObj = (rawObj) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.results-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.create-btn {
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.create-btn:hover {
+  background: #2563eb;
 }
 
 .results-count {
