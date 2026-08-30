@@ -24,7 +24,8 @@ describe('SQLite Ingestor', () => {
             verbose() {
                 return this;
             },
-            Database() {
+            // must be a regular function to support `new sqlite3.Database(...)`
+            Database: function Database() {
                 return fakeDb;
             },
         };
@@ -48,13 +49,16 @@ describe('SQLite Ingestor', () => {
 
         // Expect create resources table
         chai.expect(execCalls.some((sql) => sql.includes('CREATE TABLE IF NOT EXISTS "resources"'))).to.be.true;
-        // Expect insert into resources (should use parameterized query)
+        // Expect insert into resources
         chai.expect(runCalls.some((call) => call.sql.includes('INSERT INTO "resources"'))).to.be.true;
-        // Expect create temporary table
-        chai.expect(execCalls.some((sql) => sql.includes('CREATE TABLE "temp_testtype_'))).to.be.true;
+        // Expect create temp table scoped to type+account+region
+        chai.expect(execCalls.some((sql) => sql.includes('CREATE TEMP TABLE IF NOT EXISTS "temp_testtype_acc123_us_west_2"'))).to.be.true;
+        // Expect clear + populate temp table
+        chai.expect(runCalls.some((call) => call.sql.includes('DELETE FROM "temp_testtype_acc123_us_west_2"'))).to.be.true;
+        chai.expect(runCalls.some((call) => call.sql.includes('INSERT INTO "temp_testtype_acc123_us_west_2"'))).to.be.true;
         // Expect update deleted items
         chai.expect(runCalls.some((call) => call.sql.includes('UPDATE "resources"'))).to.be.true;
-        // Expect drop temporary table
-        chai.expect(execCalls.some((sql) => sql.includes('DROP TABLE'))).to.be.true;
+        // Expect drop temp table
+        chai.expect(execCalls.some((sql) => sql.includes('DROP TABLE IF EXISTS "temp_testtype_acc123_us_west_2"'))).to.be.true;
     });
 });

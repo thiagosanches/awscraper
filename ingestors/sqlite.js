@@ -67,20 +67,25 @@ module.exports.ingest = async function (data) {
     // checks for something that it was not returned by the scraper anymore,
     // so we need to remove it or mark it as 'DELETED' and not 'LIVE' anymore.
 
-    // TEMP TABLE is session-scoped: auto-dropped on connection close, no collision between runs
+    // Per-call TEMP TABLE: session-scoped (no orphaning on crash), unique per type+account+region (concurrency-safe)
+    const safeType = data.type.replace(/[^a-zA-Z0-9]/g, '_');
+    const safeAccount = data.AccountId.replace(/[^a-zA-Z0-9]/g, '_');
+    const safeRegion = data.ResourceRegion.replace(/[^a-zA-Z0-9]/g, '_');
+    const tempTable = `temp_${safeType}_${safeAccount}_${safeRegion}`;
+
     await new Promise((resolve, reject) => {
-        db.exec('CREATE TEMP TABLE IF NOT EXISTS "temp_ids" ("Id" TEXT NOT NULL, "AccountId" TEXT NOT NULL, "Region" TEXT NOT NULL)', (err) => {
+        db.exec(`CREATE TEMP TABLE IF NOT EXISTS "${tempTable}" ("Id" TEXT NOT NULL, "AccountId" TEXT NOT NULL, "Region" TEXT NOT NULL)`, (err) => {
             if (err) reject(err);
             else resolve();
         });
     });
 
-    await dbRun('DELETE FROM "temp_ids"', []);
+    await dbRun(`DELETE FROM "${tempTable}"`, []);
 
     // Insert into temporary table using parameterized queries
     for (let i = 0; i < data.items.length; i += 1) {
         const obj = data.items[i];
-        await dbRun('INSERT INTO "temp_ids" VALUES (?, ?, ?)', [obj.Id, data.AccountId, data.ResourceRegion]);
+        await dbRun(`INSERT INTO "${tempTable}" VALUES (?, ?, ?)`, [obj.Id, data.AccountId, data.ResourceRegion]);
     }
 
     // Update deleted items using parameterized queries
@@ -88,10 +93,17 @@ module.exports.ingest = async function (data) {
         UPDATE "resources" 
         SET "Status" = 'DELETED', 
         "LastModified" = CURRENT_TIMESTAMP 
-        WHERE "Id" NOT IN (SELECT Id FROM "temp_ids" WHERE "AccountId" = ? AND "Region" = ?) 
+        WHERE "Id" NOT IN (SELECT Id FROM "${tempTable}" WHERE "AccountId" = ? AND "Region" = ?) 
         AND "Type" = ? AND "AccountId" = ?
         AND "Region" = ?
         AND "Status" = 'LIVE'
     `;
     await dbRun(updateDeletedItemsSql, [data.AccountId, data.ResourceRegion, data.type, data.AccountId, data.ResourceRegion]);
+
+    await new Promise((resolve, reject) => {
+        db.exec(`DROP TABLE IF EXISTS "${tempTable}"`, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
 };
