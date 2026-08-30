@@ -19,6 +19,7 @@ describe('SQLite Ingestor', () => {
                 runCalls.push({ sql: sql.trim(), params });
                 if (cb) setImmediate(() => cb.call({ lastID: 1, changes: 1 }, null));
             },
+            configure() {},
         };
         const sqlite3Stub = {
             verbose() {
@@ -47,10 +48,14 @@ describe('SQLite Ingestor', () => {
 
         await ingest(data);
 
-        // Expect create resources table
+        // Expect create resources table + index
         chai.expect(execCalls.some((sql) => sql.includes('CREATE TABLE IF NOT EXISTS "resources"'))).to.be.true;
-        // Expect insert into resources
-        chai.expect(runCalls.some((call) => call.sql.includes('INSERT INTO "resources"'))).to.be.true;
+        chai.expect(execCalls.some((sql) => sql.includes('CREATE INDEX IF NOT EXISTS idx_resources_lookup'))).to.be.true;
+        // Expect transaction wrapping
+        chai.expect(runCalls.some((call) => call.sql === 'BEGIN')).to.be.true;
+        chai.expect(runCalls.some((call) => call.sql === 'COMMIT')).to.be.true;
+        // Expect upsert (ON CONFLICT) instead of plain INSERT
+        chai.expect(runCalls.some((call) => call.sql.includes('INSERT INTO "resources"') && call.sql.includes('ON CONFLICT'))).to.be.true;
         // Expect create temp table scoped to type+account+region
         chai.expect(execCalls.some((sql) => sql.includes('CREATE TEMP TABLE IF NOT EXISTS "temp_testtype_acc123_us_west_2"'))).to.be.true;
         // Expect clear + populate temp table
